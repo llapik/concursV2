@@ -52,6 +52,9 @@ export default function Footer({ lab }) {
           <div style={{ marginTop: 10, fontSize: 12, lineHeight: 1.6, color: 'var(--dim)', textWrap: 'pretty' }}>
             Реальных обращений к ИИ-сервисам ресурс не выполняет: весь «ИИ»-контент подготовлен заранее.
           </div>
+          <div style={{ marginTop: 10, fontSize: 12, lineHeight: 1.6, color: 'var(--dim)' }}>
+            Разработчик: <a href="https://llapik.github.io" target="_blank" rel="noopener noreferrer">llapik.github.io</a>
+          </div>
         </div>
         <div>
           <div
