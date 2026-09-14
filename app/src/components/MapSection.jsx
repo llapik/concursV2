@@ -125,7 +125,7 @@ export default function MapSection({ lab }) {
 
         <div style={{ display: 'grid', gap: 16, alignContent: 'start' }}>
           <div style={{ border: '1px solid var(--accent)', background: 'var(--panel)', borderRadius: 12, padding: 22 }}>
-            <div style={{ fontSize: 20, fontWeight: 800, marginBottom: 10 }}>Привет, студент 👋</div>
+            <div style={{ fontSize: 20, fontWeight: 800, marginBottom: 10 }}>Привет, студент</div>
             <div style={{ fontSize: 15, lineHeight: 1.6, color: 'var(--ink-2)', textWrap: 'pretty' }}>
               Это тренажёр по дисциплине <strong style={{ color: 'var(--ink)' }}>ОП.13 «Автоматизация бизнес-процессов»</strong>.
               Здесь ты не учишься пользоваться ИИ — <strong style={{ color: 'var(--ink)' }}>здесь ты учишься проверять то, что
