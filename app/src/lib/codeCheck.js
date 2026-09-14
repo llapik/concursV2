@@ -1,11 +1,12 @@
 export function runCodeChecks(code) {
+  const commaJoin = /ИЗ[\s\S]*?КАК\s+[А-Яа-яA-Za-z_0-9]+\s*,/i.test(code);
   return [
-    { label: 'У изображения есть осмысленный alt', ok: /<img[^>]*\salt\s*=\s*"[^"]+"/i.test(code) },
-    { label: 'Поле e-mail использует type="email"', ok: /type\s*=\s*"email"/i.test(code) },
-    { label: 'У поля есть видимая метка <label>', ok: /<label[^>]*>/i.test(code) },
+    { label: 'Звёздочка убрана — выбираются конкретные поля', ok: !/ВЫБРАТЬ[\s\S]{0,40}\*/i.test(code) },
     {
-      label: 'Сетка адаптивна (repeat/auto-fit/minmax), а не четыре жёстких колонки',
-      ok: /(auto-fit|auto-fill|minmax\()/i.test(code) && !/grid-template-columns:\s*1fr 1fr 1fr 1fr/i.test(code),
+      label: 'Используется ЛЕВОЕ СОЕДИНЕНИЕ … ПО, а не соединение через запятую',
+      ok: /ЛЕВОЕ\s+СОЕДИНЕНИЕ/i.test(code) && /\sПО\s/i.test(code) && !commaJoin,
     },
+    { label: 'Есть отбор по периоду через параметры (ГДЕ … &Параметр)', ok: /ГДЕ[\s\S]*&[А-Яа-яA-Za-z_0-9]+/i.test(code) },
+    { label: 'Дата передана в параметры виртуальной таблицы: Остатки(&…)', ok: /Остатки\s*\(\s*&/i.test(code) },
   ];
 }

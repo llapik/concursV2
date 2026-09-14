@@ -26,6 +26,10 @@
   --cyan-hi: #a8e9f0;
   --logo-pad: #ffffff;
   --header-bg: rgba(16, 17, 22, 0.92);
+  --mock-bg: #1e2029;
+  --mock-line: #2f333e;
+  --mock-ink: #e8e9ee;
+  --mock-dim: #a8adb9;
 }
 
 [data-theme='light'] {
@@ -55,6 +59,10 @@
   --cyan-hi: #084f57;
   --logo-pad: transparent;
   --header-bg: rgba(255, 255, 255, 0.92);
+  --mock-bg: #ffffff;
+  --mock-line: #ddd8cf;
+  --mock-ink: #1a1c22;
+  --mock-dim: #5e6370;
 }
 
 html,
@@ -76,12 +84,11 @@ body {
 a {
   color: var(--cyan);
   text-decoration: none;
-  border-bottom: 1px solid rgba(111, 211, 222, 0.35);
+  border-bottom: 1px solid currentColor;
 }
 
 a:hover {
   color: var(--cyan-hi);
-  border-bottom-color: var(--cyan-hi);
 }
 
 input[type='range'] {
@@ -100,7 +107,7 @@ button {
 @keyframes lab-breathe {
   0%,
   100% {
-    opacity: 0.35;
+    opacity: 0.4;
   }
   50% {
     opacity: 1;
@@ -140,7 +147,7 @@ button {
 
 .lab-nav-btn:hover {
   background: var(--panel-2);
-  color: #fff;
+  color: var(--ink);
 }
 
 .lab-tile:hover,
@@ -180,6 +187,3 @@ button {
   background: var(--panel-2);
 }
 
-.lab-fs-btn {
-  background: transparent;
-}

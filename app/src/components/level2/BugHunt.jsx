@@ -1,3 +1,13 @@
+const STEPS = [
+  { key: 'clean1', label: 'ШАГ 1', clean: true, title: 'Сотрудник создаёт заявку на закупку', sub: 'Документ «ЗаявкаНаЗакупку», автор — текущий пользователь' },
+  { key: 'noRole', label: 'ШАГ 2 — нажми', title: 'Заявка уходит «на согласование руководителю»', sub: 'Исполнитель задачи: не указан' },
+  { key: 'noDeadline', label: 'ШАГ 3 — нажми', title: 'Согласующий рассматривает заявку', sub: 'Срок исполнения: не задан' },
+  { key: 'noReject', label: 'ШАГ 4 — нажми', title: 'Развилка: «Согласовано» → дальше', sub: 'Других вариантов у развилки нет' },
+  { key: 'noBudget', label: 'ШАГ 5 — нажми', title: 'Снабжение сразу оформляет заказ поставщику', sub: 'Лимит бюджета подразделения не проверяется' },
+  { key: 'manualReentry', label: 'ШАГ 6 — нажми', title: 'Бухгалтер вручную перебивает данные заявки в поступление', sub: 'Ввод «на основании» не используется' },
+  { key: 'clean2', label: 'ШАГ 7', clean: true, title: 'Автору заявки приходит уведомление о закрытии', sub: 'Результат фиксируется в истории документа' },
+];
+
 export default function BugHunt({ lab }) {
   return (
     <div style={{ border: '1px solid var(--line)', background: 'var(--panel)', borderRadius: 14, overflow: 'hidden', marginBottom: 20 }}>
@@ -14,177 +24,73 @@ export default function BugHunt({ lab }) {
       >
         <div>
           <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11, color: 'var(--dim)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
-            Кейс 2.1
+            Задание 2.1
           </div>
-          <h3 style={{ fontSize: 21, fontWeight: 800, margin: '6px 0 0', letterSpacing: '-0.02em' }}>Найди баг юзабилити</h3>
+          <h3 style={{ fontSize: 21, fontWeight: 800, margin: '6px 0 0', letterSpacing: '-0.02em' }}>Найди 5 разрывов в схеме процесса</h3>
         </div>
-        <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 12, color: 'var(--accent-text)' }}>
-          найдено {lab.foundCount} / 5
-        </div>
+        <div style={{ fontSize: 15, fontWeight: 800, color: 'var(--accent-text)', whiteSpace: 'nowrap' }}>Найдено {lab.foundCount} из 5</div>
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))' }}>
         <div style={{ padding: 24, borderRight: '1px solid var(--line)' }}>
           <div
             style={{
-              fontFamily: "'IBM Plex Mono', monospace",
-              fontSize: 11,
-              color: 'var(--dim)',
-              letterSpacing: '0.1em',
-              textTransform: 'uppercase',
-              marginBottom: 14,
+              border: '1px solid var(--line)',
+              background: 'var(--panel-2)',
+              borderLeft: '4px solid var(--accent)',
+              borderRadius: 8,
+              padding: '14px 16px',
+              marginBottom: 16,
             }}
           >
-            Форма «сгенерирована ИИ» · кликай по проблемным зонам
+            <div style={{ fontSize: 14, fontWeight: 800, color: 'var(--accent-text)', marginBottom: 6 }}>Что делать</div>
+            <div style={{ fontSize: 14, lineHeight: 1.5, color: 'var(--ink-2)' }}>
+              ИИ описал бизнес-процесс «Согласование заявки на закупку» для внедрения в 1С.{' '}
+              <strong style={{ color: 'var(--ink)' }}>Нажимай мышкой на те шаги, где видишь разрыв или ошибку.</strong>{' '}
+              Мерцающая пунктирная рамка — зона, по которой можно нажать. Ошибок ровно 5, справа появится объяснение.
+            </div>
           </div>
-
-          <div style={{ background: '#1e2029', border: '1px solid #2f333e', borderRadius: 10, padding: 22, color: '#e8e9ee' }}>
-            <div
-              onClick={lab.hit.clean1}
-              style={{ cursor: 'pointer', outline: lab.ring.clean1, outlineOffset: 4, borderRadius: 4 }}
-            >
-              <div style={{ fontSize: 19, fontWeight: 800, marginBottom: 4, color: '#e8e9ee' }}>Запись на консультацию</div>
-              <div style={{ fontSize: 13, color: '#a8adb9' }}>Заполните форму, и мы свяжемся с вами</div>
+          {lab.hintOn && (
+            <div style={{ border: '1px dashed var(--accent)', borderRadius: 8, padding: '12px 14px', marginBottom: 14, fontSize: 13.5, lineHeight: 1.55, color: 'var(--ink-2)' }}>
+              Подсказка: ищи шаг без ответственного, шаг без срока, развилку с единственным выходом, повторный ручной
+              ввод тех же данных и отсутствие контроля лимита бюджета.
             </div>
+          )}
 
-            <div
-              onClick={lab.hit.noLabel}
-              style={{
-                marginTop: 18,
-                cursor: 'pointer',
-                outline: lab.ring.noLabel,
-                outlineOffset: 6,
-                borderRadius: 4,
-                animation: lab.anim.noLabel,
-              }}
-            >
-              <input
-                type="text"
-                placeholder="Введите имя"
-                readOnly
+          <div style={{ background: 'var(--mock-bg)', border: '1px solid var(--mock-line)', borderRadius: 10, padding: 20, color: 'var(--mock-ink)', display: 'grid', gap: 10 }}>
+            {STEPS.map((s) => (
+              <div
+                key={s.key}
+                onClick={lab.hit[s.key]}
                 style={{
-                  width: '100%',
-                  background: '#14151a',
-                  border: '1px solid #3a3e4a',
-                  borderRadius: 6,
-                  padding: '11px 12px',
-                  color: '#e8e9ee',
-                  fontFamily: 'Manrope, sans-serif',
-                  fontSize: 14,
-                  pointerEvents: 'none',
+                  cursor: 'pointer',
+                  outline: s.clean ? '1px dashed var(--mock-line)' : lab.ring[s.key],
+                  outlineOffset: 4,
+                  borderRadius: 4,
+                  padding: '8px 10px',
+                  animation: s.clean ? undefined : lab.anim[s.key],
                 }}
-              />
-            </div>
-
-            <div
-              onClick={lab.hit.tabOrder}
-              style={{
-                marginTop: 12,
-                cursor: 'pointer',
-                outline: lab.ring.tabOrder,
-                outlineOffset: 6,
-                borderRadius: 4,
-                animation: lab.anim.tabOrder,
-              }}
-            >
-              <label style={{ display: 'block', fontSize: 12, color: '#a8adb9', marginBottom: 5 }}>Телефон</label>
-              <input
-                type="text"
-                tabIndex={7}
-                placeholder="+7"
-                readOnly
-                style={{
-                  width: '100%',
-                  background: '#14151a',
-                  border: '1px solid #3a3e4a',
-                  borderRadius: 6,
-                  padding: '11px 12px',
-                  color: '#e8e9ee',
-                  fontFamily: 'Manrope, sans-serif',
-                  fontSize: 14,
-                  pointerEvents: 'none',
-                }}
-              />
-              <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 10, color: '#6c7280', marginTop: 4 }}>
-                tabindex="7"
+              >
+                <div
+                  style={{
+                    fontFamily: "'IBM Plex Mono', monospace",
+                    fontSize: 10,
+                    color: s.clean ? 'var(--mock-dim)' : 'var(--accent-text)',
+                    marginBottom: 3,
+                  }}
+                >
+                  {s.label}
+                </div>
+                <div style={{ fontSize: 14, fontWeight: 700 }}>{s.title}</div>
+                <div style={{ fontSize: 12.5, color: 'var(--mock-dim)', marginTop: 2 }}>{s.sub}</div>
               </div>
-            </div>
-
-            <div
-              onClick={lab.hit.lowContrast}
-              style={{
-                marginTop: 14,
-                cursor: 'pointer',
-                outline: lab.ring.lowContrast,
-                outlineOffset: 6,
-                borderRadius: 4,
-                animation: lab.anim.lowContrast,
-              }}
-            >
-              <div style={{ fontSize: 12, color: '#4d515c' }}>Мы не передаём данные третьим лицам</div>
-            </div>
-
-            <div
-              onClick={lab.hit.tinyTarget}
-              style={{
-                marginTop: 14,
-                cursor: 'pointer',
-                outline: lab.ring.tinyTarget,
-                outlineOffset: 6,
-                borderRadius: 4,
-                display: 'flex',
-                alignItems: 'center',
-                gap: 8,
-                animation: lab.anim.tinyTarget,
-              }}
-            >
-              <span style={{ width: 11, height: 11, border: '1px solid #6c7280', borderRadius: 2, display: 'inline-block', flex: 'none' }} />
-              <span style={{ fontSize: 12, color: '#a8adb9' }}>Согласен с обработкой данных</span>
-            </div>
-
-            <div
-              onClick={lab.hit.hierarchy}
-              style={{
-                marginTop: 20,
-                cursor: 'pointer',
-                outline: lab.ring.hierarchy,
-                outlineOffset: 6,
-                borderRadius: 4,
-                display: 'flex',
-                gap: 10,
-                animation: lab.anim.hierarchy,
-              }}
-            >
-              <span style={{ background: '#f2b03d', color: '#14151a', borderRadius: 6, padding: '12px 20px', fontSize: 14, fontWeight: 800 }}>
-                Отмена
-              </span>
-              <span style={{ background: 'transparent', color: '#8a90a0', border: '1px solid #3a3e4a', borderRadius: 6, padding: '12px 20px', fontSize: 14 }}>
-                Записаться
-              </span>
-            </div>
-
-            <div
-              onClick={lab.hit.clean2}
-              style={{ marginTop: 18, cursor: 'pointer', outline: lab.ring.clean2, outlineOffset: 4, borderRadius: 4 }}
-            >
-              <div style={{ fontSize: 12, color: '#a8adb9' }}>
-                Нужна помощь? <a href="#">Напишите нам</a>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
 
         <div style={{ padding: 24 }}>
-          <div
-            style={{
-              fontFamily: "'IBM Plex Mono', monospace",
-              fontSize: 11,
-              color: 'var(--dim)',
-              letterSpacing: '0.1em',
-              textTransform: 'uppercase',
-              marginBottom: 14,
-            }}
-          >
-            Журнал проверки
+          <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 4 }}>Что ты нашёл</div>
+          <div style={{ fontSize: 13.5, lineHeight: 1.5, color: 'var(--ink-3)', marginBottom: 14 }}>
+            Список заполняется сам, когда ты попадаешь по ошибке.
           </div>
           {lab.msg && (
             <div
@@ -193,7 +99,7 @@ export default function BugHunt({ lab }) {
                 background: 'var(--panel-2)',
                 borderRadius: 8,
                 padding: '12px 14px',
-                fontSize: 13,
+                fontSize: 13.5,
                 lineHeight: 1.5,
                 color: 'var(--ink-2)',
                 marginBottom: 14,
@@ -212,31 +118,49 @@ export default function BugHunt({ lab }) {
                   <span style={{ fontSize: 14, fontWeight: 600, color: b.titleColor }}>{b.title}</span>
                 </div>
                 {b.found && (
-                  <div style={{ marginTop: 6, paddingLeft: 22, fontSize: 13, lineHeight: 1.5, color: 'var(--dim)', textWrap: 'pretty' }}>
+                  <div style={{ marginTop: 6, paddingLeft: 22, fontSize: 13, lineHeight: 1.5, color: 'var(--ink-3)', textWrap: 'pretty' }}>
                     {b.why}
                   </div>
                 )}
               </div>
             ))}
           </div>
-          <button
-            onClick={lab.resetBugs}
-            className="lab-outline-btn lab-outline-btn--ink"
-            style={{
-              marginTop: 16,
-              background: 'transparent',
-              border: '1px solid var(--line-2)',
-              color: 'var(--dim)',
-              borderRadius: 8,
-              padding: '10px 16px',
-              fontFamily: "'IBM Plex Mono', monospace",
-              fontSize: 12,
-              cursor: 'pointer',
-              minHeight: 44,
-            }}
-          >
-            Сбросить кейс
-          </button>
+          <div style={{ display: 'flex', gap: 10, marginTop: 16, flexWrap: 'wrap' }}>
+            <button
+              onClick={lab.toggleHint}
+              style={{
+                background: 'var(--panel-3)',
+                border: '1px solid var(--line-2)',
+                color: 'var(--ink)',
+                borderRadius: 8,
+                padding: '12px 18px',
+                fontFamily: 'Manrope, sans-serif',
+                fontSize: 14,
+                fontWeight: 700,
+                cursor: 'pointer',
+                minHeight: 44,
+              }}
+            >
+              {lab.hintLabel}
+            </button>
+            <button
+              onClick={lab.resetBugs}
+              className="lab-outline-btn lab-outline-btn--ink"
+              style={{
+                background: 'transparent',
+                border: '1px solid var(--line-2)',
+                color: 'var(--ink-2)',
+                borderRadius: 8,
+                padding: '12px 18px',
+                fontFamily: 'Manrope, sans-serif',
+                fontSize: 14,
+                cursor: 'pointer',
+                minHeight: 44,
+              }}
+            >
+              Начать заново
+            </button>
+          </div>
         </div>
       </div>
     </div>

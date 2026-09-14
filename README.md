@@ -1,25 +1,15 @@
-# CODING AGENTS: READ THIS FIRST
+# 1С Lab: ИИ под проверкой
 
-This is a **handoff bundle** from Claude Design (claude.ai/design).
+Электронный образовательный ресурс (тренажёр) для СПО — специальность **09.02.11 «Разработка и управление программным обеспечением»**, дисциплина **ОП.13 «Автоматизация бизнес-процессов»**. Студент не учится пользоваться ИИ, а учится **проверять результат ИИ** в задачах 1С: схему бизнес-процесса, расчёт окупаемости, запрос на языке 1С, постановку задачи для доработки.
 
-A user mocked up designs in HTML/CSS/JS using an AI design tool, then exported this bundle so a coding agent can implement the designs for real.
+Односtраничное веб-приложение, полностью в браузере — никаких обращений к ИИ-сервисам и никакого бэкенда. Прогресс хранится в `localStorage`.
 
-## What you should do — IMPORTANT
+## Repo layout
 
-**Read the chat transcripts first.** There are 1 chat transcript(s) in `chats/`. The transcripts show the full back-and-forth between the user and the design assistant — they tell you **what the user actually wants** and **where they landed** after iterating. Don't skip them. The final HTML files are the output, but the chat is where the intent lives.
+- **`app/`** — рабочая реализация (React + Vite), развёрнута на GitHub Pages. См. `app/README.md`.
+- **`project/`** — дизайн-хэндофф из Claude Design (claude.ai/design): `1C Lab.dc.html` — прототип со всей логикой проверок, `DESIGN_SPEC.md` — подробное текстовое ТЗ по экранам/токенам/поведению, `logo-mgpk.png`, `support.js` (служебный рантайм прототипа, в `app/` не переносится), `uploads/` — исходное конкурсное ТЗ (внимание: там ещё прежняя дисциплина проекта — «UI/UX Lab», актуальная версия — этот 1С Lab).
+- **`.github/workflows/deploy.yml`** — автодеплой `app/` на GitHub Pages при пуше в `main`.
 
-**Read `project/UI-UX Lab.dc.html` in full.** The user had this file open when they triggered the handoff, so it's almost certainly the primary design they want built. Read it top to bottom — don't skim. Then **follow its imports**: open every file it pulls in (shared components, CSS, scripts) so you understand how the pieces fit together before you start implementing.
+## Развитие проекта
 
-**If anything is ambiguous, ask the user to confirm before you start implementing.** It's much cheaper to clarify scope up front than to build the wrong thing.
-
-## About the design files
-
-The design medium is **HTML/CSS/JS** — these are prototypes, not production code. Your job is to **recreate them pixel-perfectly** in whatever technology makes sense for the target codebase (React, Vue, native, whatever fits). Match the visual output; don't copy the prototype's internal structure unless it happens to fit.
-
-**Don't render these files in a browser or take screenshots unless the user asks you to.** Everything you need — dimensions, colors, layout rules — is spelled out in the source. Read the HTML and CSS directly; a screenshot won't tell you anything they don't.
-
-## Bundle contents
-
-- `README.md` — this file
-- `chats/` — conversation transcripts (read these!)
-- `project/` — the `UI/UX Lab: ИИ под проверкой` project files (HTML prototypes, assets, components)
+Более ранняя версия этого репозитория была прототипом «UI/UX Lab: ИИ под проверкой» (МДК по проектированию интерфейсов). Конкурсный проект пивотировал на дисциплину ОП.13 «Автоматизация бизнес-процессов» — текущая реализация в `app/` реализует именно **1С Lab**. История предыдущей версии доступна в git log.

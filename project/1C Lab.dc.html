@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root, [data-theme="dark"] {
+    --bg: #101116; --grid: #191b22; --footer: #0d0e12;
+    --panel: #171921; --panel-2: #1b1d24; --panel-3: #20232c; --field: #14151a;
+    --line: #2a2d37; --line-2: #3a3e4a; --line-3: #23262f;
+    --ink: #e8e9ee; --ink-2: #c9ccd6; --ink-3: #b3b8c4; --dim: #9ba1af;
+    --accent: #f2b03d; --accent-hi: #ffc558; --accent-text: #f2b03d; --accent-soft: #2a2413;
+    --on-accent: #14151a; --ok: #7fd98a; --ok-line: #33513c; --bad: #e8735f;
+    --cyan: #6fd3de; --cyan-hi: #a8e9f0; --logo-pad: #ffffff; --header-bg: rgba(16,17,22,0.92);
+    --mock-bg: #1e2029; --mock-line: #2f333e; --mock-ink: #e8e9ee; --mock-dim: #a8adb9;
+  }
+  [data-theme="light"] {
+    --bg: #f5f3ef; --grid: #e7e3da; --footer: #ece9e2;
+    --panel: #ffffff; --panel-2: #faf8f4; --panel-3: #f2eee6; --field: #ffffff;
+    --line: #ddd8cf; --line-2: #c8c2b6; --line-3: #e7e3da;
+    --ink: #1a1c22; --ink-2: #3c4048; --ink-3: #4a4e58; --dim: #5e6370;
+    --accent: #e09a1f; --accent-hi: #f2b03d; --accent-text: #8a5600; --accent-soft: #fbf0d8;
+    --on-accent: #14151a; --ok: #1d7a34; --ok-line: #b6d8bc; --bad: #b23a24;
+    --cyan: #0b6d78; --cyan-hi: #084f57; --logo-pad: transparent; --header-bg: rgba(255,255,255,0.92);
+    --mock-bg: #ffffff; --mock-line: #ddd8cf; --mock-ink: #1a1c22; --mock-dim: #5e6370;
+  }
+  html, body { margin: 0; padding: 0; background: var(--bg); transition: background 0.25s ease; }
+  * { box-sizing: border-box; }
+  a { color: var(--cyan); text-decoration: none; border-bottom: 1px solid currentColor; }
+  a:hover { color: var(--cyan-hi); }
+  input[type="range"] { accent-color: var(--accent-text); }
+  ::selection { background: var(--accent); color: var(--bg); }
+  @keyframes lab-breathe { 0%, 100% { opacity: 0.4 } 50% { opacity: 1 } }
+  @keyframes lab-sweep { 0% { transform: translateY(-100%) } 100% { transform: translateY(400%) } }
+  @keyframes lab-caret { 0%, 49% { opacity: 1 } 50%, 100% { opacity: 0 } }
+  @keyframes lab-pop { from { transform: scale(0.9); opacity: 0 } to { transform: scale(1); opacity: 1 } }
+</style>
+</helmet>
+<div data-theme="{{ theme }}" style="min-height: 100vh; background: var(--bg); color: var(--ink); transition: background 0.25s ease, color 0.25s ease; background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px); background-size: 48px 48px; font-family: Manrope, Helvetica, sans-serif; zoom: {{ zoom }}">
+
+  <header style="position: sticky; top: 0; z-index: 20; background: var(--header-bg); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line)">
+    <div style="max-width: 1180px; margin: 0 auto; padding: 12px 24px; display: grid; gap: 10px">
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap">
+      <div style="display: flex; align-items: center; gap: 12px">
+        <img src="logo-mgpk.png" alt="Московский государственный образовательный комплекс" style="height: 34px; width: auto; display: block; background: var(--logo-pad); border-radius: 5px; padding: 2px 4px" />
+        <span style="width: 1px; height: 26px; background: var(--line)"></span>
+        <span style="font-weight: 800; font-size: 19px; letter-spacing: -0.02em; white-space: nowrap">1С LAB</span>
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--accent-text); letter-spacing: 0.12em; text-transform: uppercase; white-space: nowrap">ИИ под проверкой</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 12px; flex: none">
+        <button onClick="{{ toggleTheme }}" aria-label="Переключить тему оформления" style="display: flex; align-items: center; gap: 8px; background: transparent; border: 1px solid var(--line-2); color: var(--ink); border-radius: 22px; padding: 0 14px; min-height: 44px; font-family: Manrope, sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap" style-hover="border-color: var(--accent)">
+          <span style="width: 12px; height: 12px; border-radius: 50%; background: var(--accent); box-shadow: inset {{ themeDotShadow }}"></span>
+          <span>{{ themeLabel }}</span>
+        </button>
+        <span style="font-size: 13px; font-weight: 600; color: var(--ink); white-space: nowrap">Выполнено {{ doneCount }} из 6</span>
+        <div style="width: 110px; height: 6px; background: var(--line-3); border-radius: 3px; overflow: hidden">
+          <div style="height: 100%; background: var(--accent); border-radius: 3px; transition: width 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); width: {{ pct }}"></div>
+        </div>
+      </div>
+      </div>
+      <nav style="display: flex; gap: 4px; flex-wrap: wrap; border-top: 1px solid var(--line); padding-top: 6px">
+        <button onClick="{{ go.map }}" style="position: relative; background: transparent; border: 0; color: var(--ink-2); font-family: Manrope, sans-serif; font-size: 14px; font-weight: 600; padding: 8px 12px; cursor: pointer; border-radius: 6px; white-space: nowrap" style-hover="background: var(--panel-2); color: var(--ink)">
+          <span style="display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 50%; background: var(--line-3); color: var(--ink); font-family: 'IBM Plex Mono', monospace; font-size: 11px; margin-right: 7px">★</span>Главная
+          <sc-if value="{{ isMap }}" hint-placeholder-val="{{ true }}"><span style="position: absolute; left: 12px; right: 12px; bottom: 2px; height: 2px; background: var(--accent)"></span></sc-if>
+        </button>
+        <button onClick="{{ go.l1 }}" style="position: relative; background: transparent; border: 0; color: var(--ink-2); font-family: Manrope, sans-serif; font-size: 14px; font-weight: 600; padding: 8px 12px; cursor: pointer; border-radius: 6px; white-space: nowrap" style-hover="background: var(--panel-2); color: var(--ink)">
+          <span style="display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 50%; background: var(--accent); color: var(--on-accent); font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; margin-right: 7px">1</span>Шаг 1 · Теория
+          <sc-if value="{{ isL1 }}" hint-placeholder-val="{{ false }}"><span style="position: absolute; left: 12px; right: 12px; bottom: 2px; height: 2px; background: var(--accent)"></span></sc-if>
+        </button>
+        <button onClick="{{ go.l2 }}" style="position: relative; background: transparent; border: 0; color: var(--ink-2); font-family: Manrope, sans-serif; font-size: 14px; font-weight: 600; padding: 8px 12px; cursor: pointer; border-radius: 6px; white-space: nowrap" style-hover="background: var(--panel-2); color: var(--ink)">
+          <span style="display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 50%; background: var(--accent); color: var(--on-accent); font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; margin-right: 7px">2</span>Шаг 2 · Практика
+          <sc-if value="{{ isL2 }}" hint-placeholder-val="{{ false }}"><span style="position: absolute; left: 12px; right: 12px; bottom: 2px; height: 2px; background: var(--accent)"></span></sc-if>
+        </button>
+        <button onClick="{{ go.l3 }}" style="position: relative; background: transparent; border: 0; color: var(--ink-2); font-family: Manrope, sans-serif; font-size: 14px; font-weight: 600; padding: 8px 12px; cursor: pointer; border-radius: 6px; white-space: nowrap" style-hover="background: var(--panel-2); color: var(--ink)">
+          <span style="display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 50%; background: var(--accent); color: var(--on-accent); font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; margin-right: 7px">3</span>Шаг 3 · Проект
+          <sc-if value="{{ isL3 }}" hint-placeholder-val="{{ false }}"><span style="position: absolute; left: 12px; right: 12px; bottom: 2px; height: 2px; background: var(--accent)"></span></sc-if>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <main style="max-width: 1180px; margin: 0 auto; padding: 0 24px">
+
+    <sc-if value="{{ isMap }}" hint-placeholder-val="{{ true }}">
+    <section style="padding: 56px 0 40px">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 40px; align-items: start">
+        <div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--accent-text); letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 18px">Тренажёр · ОП.13 Автоматизация бизнес-процессов</div>
+          <h1 style="font-size: clamp(30px, 5vw, 56px); line-height: 1.05; letter-spacing: -0.035em; font-weight: 800; margin: 0 0 20px; text-wrap: pretty">ИИ предложил решение в 1С.<br />Найди, где он <span style="color: var(--accent-text)">ошибся</span>.</h1>
+          <p style="font-size: 17px; line-height: 1.6; color: var(--ink-3); max-width: 56ch; margin: 0 0 24px; text-wrap: pretty">ИИ быстро рисует схемы процессов, пишет запросы и код на встроенном языке 1С — и так же быстро ошибается. Твоя работа: <strong style="color: var(--ink)">проверить, посчитать и исправить</strong>.</p>
+
+          <div style="border: 1px solid var(--line); background: var(--panel); border-radius: 12px; padding: 18px 20px; margin-bottom: 24px">
+            <div style="font-size: 15px; font-weight: 800; margin-bottom: 12px">Как проходить — 3 шага</div>
+            <div style="display: grid; gap: 10px">
+              <div style="display: flex; gap: 12px; align-items: flex-start">
+                <span style="flex: none; display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 50%; background: var(--accent); color: var(--on-accent); font-weight: 800; font-size: 14px">1</span>
+                <span style="font-size: 15px; line-height: 1.45; color: var(--ink-2)">Открой <strong style="color: var(--ink)">Шаг 1 · Теория</strong> — прочитай 6 карточек и ответь на 3 вопроса.</span>
+              </div>
+              <div style="display: flex; gap: 12px; align-items: flex-start">
+                <span style="flex: none; display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 50%; background: var(--accent); color: var(--on-accent); font-weight: 800; font-size: 14px">2</span>
+                <span style="font-size: 15px; line-height: 1.45; color: var(--ink-2)">Пройди <strong style="color: var(--ink)">Шаг 2 · Практика</strong> — 4 задания: схема процесса, расчёт окупаемости, запрос 1С, сравнение «до / после».</span>
+              </div>
+              <div style="display: flex; gap: 12px; align-items: flex-start">
+                <span style="flex: none; display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 50%; background: var(--accent); color: var(--on-accent); font-weight: 800; font-size: 14px">3</span>
+                <span style="font-size: 15px; line-height: 1.45; color: var(--ink-2)">Сдай <strong style="color: var(--ink)">Шаг 3 · Проект</strong> — собери постановку задачи для ИИ и напиши вывод.</span>
+              </div>
+            </div>
+            <div style="margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--line-2); font-size: 14px; line-height: 1.5; color: var(--ink-3)">Каждое выполненное задание попадает в счётчик «Выполнено» сверху. Сломать ничего нельзя — у любого задания есть кнопка «Начать заново».</div>
+          </div>
+
+          <div style="display: flex; gap: 12px; flex-wrap: wrap">
+            <button onClick="{{ go.l1 }}" style="background: var(--accent); color: var(--on-accent); border: 0; border-radius: 8px; padding: 16px 26px; font-family: Manrope, sans-serif; font-size: 16px; font-weight: 800; cursor: pointer; min-height: 52px" style-hover="background: var(--accent-hi)">▶ Начать с шага 1</button>
+            <button onClick="{{ go.l2 }}" style="background: transparent; color: var(--ink); border: 1px solid var(--line-2); border-radius: 8px; padding: 16px 26px; font-family: Manrope, sans-serif; font-size: 16px; font-weight: 600; cursor: pointer; min-height: 52px" style-hover="border-color: var(--dim)">Сразу к практике</button>
+          </div>
+        </div>
+
+        <div style="display: grid; gap: 16px; align-content: start">
+          <div style="border: 1px solid var(--accent); background: var(--panel); border-radius: 12px; padding: 22px">
+            <div style="font-size: 20px; font-weight: 800; margin-bottom: 10px">Привет, студент 👋</div>
+            <div style="font-size: 15px; line-height: 1.6; color: var(--ink-2); text-wrap: pretty">Это тренажёр по дисциплине <strong style="color: var(--ink)">ОП.13 «Автоматизация бизнес-процессов»</strong>. Здесь ты не учишься пользоваться ИИ — <strong style="color: var(--ink)">здесь ты учишься проверять то, что ИИ выдал</strong>: схему процесса, расчёт окупаемости, запрос и код в 1С.</div>
+            <div style="margin-top: 16px; display: grid; gap: 12px">
+              <div>
+                <div style="font-size: 13px; font-weight: 800; color: var(--accent-text); margin-bottom: 3px">Зачем это нужно</div>
+                <div style="font-size: 14px; line-height: 1.5; color: var(--ink-2)">На работе за ошибку ИИ отвечает не ИИ, а специалист, который её пропустил. Тренажёр учит замечать такие ошибки до того, как они попадут в базу заказчика.</div>
+              </div>
+              <div>
+                <div style="font-size: 13px; font-weight: 800; color: var(--accent-text); margin-bottom: 3px">Что ты сделаешь</div>
+                <div style="font-size: 14px; line-height: 1.5; color: var(--ink-2)">Найдёшь 5 разрывов в бизнес-процессе, пересчитаешь окупаемость автоматизации, исправишь запрос на языке 1С и соберёшь постановку задачи для ИИ.</div>
+              </div>
+              <div>
+                <div style="font-size: 13px; font-weight: 800; color: var(--accent-text); margin-bottom: 3px">Сколько времени</div>
+                <div style="font-size: 14px; line-height: 1.5; color: var(--ink-2)">Около 40 минут на все 6 заданий. Можно закрыть страницу и вернуться — прогресс сохранится.</div>
+              </div>
+            </div>
+          </div>
+
+        <div style="position: relative; border: 1px solid var(--line); background: var(--panel); border-radius: 12px; padding: 20px; overflow: hidden">
+          <div style="position: absolute; left: 0; right: 0; top: 0; height: 28px; background: linear-gradient(180deg, transparent, var(--accent-soft), transparent); animation: lab-sweep 6s linear infinite; pointer-events: none"></div>
+          <div style="position: relative; background: var(--field); border: 1px solid var(--line-2); border-radius: 8px; padding: 12px 14px; margin-bottom: 18px; font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; line-height: 1.5; color: var(--ink-2); min-height: 56px">
+            <span style="color: var(--accent-text)">запрос к ИИ → </span>{{ typed }}<span style="display: inline-block; width: 7px; height: 14px; background: var(--accent); vertical-align: -2px; animation: lab-caret 1s step-end infinite"></span>
+          </div>
+          <div style="font-size: 14px; font-weight: 800; margin-bottom: 14px">Проверку делает не ИИ, а сам тренажёр</div>
+          <div style="display: grid; gap: 10px">
+            <div style="display: flex; gap: 10px; align-items: baseline"><span style="font-family: 'IBM Plex Mono', monospace; color: var(--cyan); font-size: 12px">01</span><span style="font-size: 14px; color: var(--ink-2)">Окупаемость считается по твоим цифрам прямо в браузере</span></div>
+            <div style="display: flex; gap: 10px; align-items: baseline"><span style="font-family: 'IBM Plex Mono', monospace; color: var(--cyan); font-size: 12px">02</span><span style="font-size: 14px; color: var(--ink-2)">Клики по схеме сверяются с картой реальных разрывов процесса</span></div>
+            <div style="display: flex; gap: 10px; align-items: baseline"><span style="font-family: 'IBM Plex Mono', monospace; color: var(--cyan); font-size: 12px">03</span><span style="font-size: 14px; color: var(--ink-2)">Запрос проверяется разбором того, что написал студент</span></div>
+            <div style="display: flex; gap: 10px; align-items: baseline"><span style="font-family: 'IBM Plex Mono', monospace; color: var(--cyan); font-size: 12px">04</span><span style="font-size: 14px; color: var(--ink-2)">Прогресс хранится в браузере — без интернета и без сервера</span></div>
+          </div>
+        </div>
+        </div>
+      </div>
+
+      <div style="margin: 52px 0 0; display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap">
+        <h2 style="font-size: 22px; font-weight: 800; letter-spacing: -0.02em; margin: 0">Все 6 заданий</h2>
+        <span style="font-size: 14px; color: var(--ink-3)">нажми на любую плитку, чтобы открыть задание</span>
+      </div>
+      <div style="margin-top: 18px; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px">
+        <sc-for list="{{ tiles }}" as="t" hint-placeholder-count="6">
+          <button onClick="{{ t.go }}" style="text-align: left; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 18px; cursor: pointer; color: var(--ink); font-family: Manrope, sans-serif; min-height: 140px; display: flex; flex-direction: column; gap: 8px" style-hover="border-color: var(--accent-text)">
+            <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px">
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--dim); letter-spacing: 0.1em; white-space: nowrap">{{ t.code }}</span>
+              <span style="font-size: 12px; font-weight: 600; color: {{ t.stampColor }}; white-space: nowrap">{{ t.stamp }}</span>
+            </div>
+            <span style="font-size: 16px; font-weight: 800; letter-spacing: -0.01em">{{ t.title }}</span>
+            <span style="font-size: 13px; line-height: 1.5; color: var(--ink-3); text-wrap: pretty">{{ t.desc }}</span>
+            <span style="margin-top: auto; font-size: 13px; font-weight: 700; color: var(--accent-text)">Открыть задание →</span>
+          </button>
+        </sc-for>
+      </div>
+    </section>
+    </sc-if>
+
+    <sc-if value="{{ isL1 }}" hint-placeholder-val="{{ false }}">
+    <section style="padding: 48px 0 40px">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--accent-text); letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 12px">Шаг 1 · Теория</div>
+      <h2 style="font-size: clamp(26px, 3.6vw, 36px); font-weight: 800; letter-spacing: -0.03em; margin: 0 0 14px">Где граница доверия к ИИ в 1С</h2>
+      <div style="border: 1px solid var(--line); background: var(--panel); border-left: 4px solid var(--accent); border-radius: 10px; padding: 18px 20px; margin-bottom: 26px; max-width: 74ch">
+        <div style="font-size: 15px; font-weight: 800; margin-bottom: 8px; color: var(--accent-text)">Что делать на этом шаге</div>
+        <div style="font-size: 15px; line-height: 1.55; color: var(--ink-2)">1. Нажми на каждую из 6 карточек ниже — внутри откроется «ловушка» этого инструмента.<br />2. Пролистай вниз и ответь на 3 вопроса. Ответ проверяется сразу.<br />3. Когда все 3 ответа верны — шаг зачтён, появится зелёное уведомление.</div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px">
+        <sc-for list="{{ cards }}" as="c" hint-placeholder-count="6">
+          <div onClick="{{ c.toggle }}" style="background: var(--panel); border: 1px solid var(--line); border-left: 3px solid {{ c.accent }}; border-radius: 10px; padding: 18px; cursor: pointer" style-hover="border-color: var(--line-2)">
+            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--dim); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 10px">{{ c.tag }}</div>
+            <div style="font-size: 17px; font-weight: 800; letter-spacing: -0.01em; margin-bottom: 8px">{{ c.title }}</div>
+            <div style="font-size: 14px; line-height: 1.55; color: var(--ink-3); text-wrap: pretty">{{ c.body }}</div>
+            <sc-if value="{{ c.open }}" hint-placeholder-val="{{ false }}">
+              <div style="margin-top: 14px; padding-top: 14px; border-top: 1px dashed var(--line-2)">
+                <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--accent-text); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 6px">Ловушка</div>
+                <div style="font-size: 14px; line-height: 1.55; color: var(--ink-2); text-wrap: pretty">{{ c.trap }}</div>
+              </div>
+            </sc-if>
+            <sc-if value="{{ c.closed }}" hint-placeholder-val="{{ true }}">
+              <div style="margin-top: 12px; display: inline-flex; align-items: center; gap: 7px; background: var(--panel-3); border-radius: 16px; padding: 7px 12px; font-size: 12px; font-weight: 700; color: var(--ink-2)">Нажми, чтобы увидеть ловушку</div>
+            </sc-if>
+          </div>
+        </sc-for>
+      </div>
+
+      <div style="margin-top: 44px; border: 1px solid var(--line); background: var(--panel); border-radius: 12px; padding: 24px">
+        <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 16px; flex-wrap: wrap; margin-bottom: 18px">
+          <div>
+            <h3 style="font-size: 20px; font-weight: 800; margin: 0 0 6px; letter-spacing: -0.02em">Задание: ответь на 3 вопроса</h3>
+            <div style="font-size: 14px; color: var(--ink-3)">Нажми на тот вариант, который считаешь правильным. Верный ответ подсветится зелёным.</div>
+          </div>
+          <span style="font-size: 14px; font-weight: 700; color: var(--accent-text); white-space: nowrap">Верно {{ quizScore }} из 3</span>
+        </div>
+        <div style="display: grid; gap: 22px">
+          <sc-for list="{{ questions }}" as="q" hint-placeholder-count="3">
+            <div>
+              <div style="font-size: 16px; font-weight: 700; line-height: 1.45; margin-bottom: 10px; text-wrap: pretty">{{ q.num }}. {{ q.text }}</div>
+              <div style="display: flex; flex-direction: column; gap: 8px">
+                <sc-for list="{{ q.options }}" as="o" hint-placeholder-count="3">
+                  <button onClick="{{ o.pick }}" style="text-align: left; background: {{ o.bg }}; border: 1px solid {{ o.border }}; color: var(--ink); border-radius: 8px; padding: 12px 14px; font-family: Manrope, sans-serif; font-size: 14px; cursor: pointer; min-height: 44px; display: flex; gap: 10px; align-items: center" style-hover="border-color: var(--dim)">
+                    <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: {{ o.markColor }}; width: 14px">{{ o.mark }}</span>
+                    <span>{{ o.text }}</span>
+                  </button>
+                </sc-for>
+              </div>
+              <sc-if value="{{ q.answered }}" hint-placeholder-val="{{ false }}">
+                <div style="margin-top: 10px; font-size: 13.5px; line-height: 1.5; color: var(--ink-3); text-wrap: pretty">↳ {{ q.explain }}</div>
+              </sc-if>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="margin-top: 30px; display: flex; justify-content: flex-end">
+        <button onClick="{{ go.l2 }}" style="background: var(--accent); color: var(--on-accent); border: 0; border-radius: 8px; padding: 16px 26px; font-family: Manrope, sans-serif; font-size: 16px; font-weight: 800; cursor: pointer; min-height: 52px" style-hover="background: var(--accent-hi)">Дальше: шаг 2 · Практика →</button>
+      </div>
+    </section>
+    </sc-if>
+
+    <sc-if value="{{ isL2 }}" hint-placeholder-val="{{ false }}">
+    <section style="padding: 48px 0 40px">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--accent-text); letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 12px">Шаг 2 · Практика</div>
+      <h2 style="font-size: clamp(26px, 3.6vw, 36px); font-weight: 800; letter-spacing: -0.03em; margin: 0 0 14px">Практика: 4 задания подряд</h2>
+      <div style="border: 1px solid var(--line); background: var(--panel); border-left: 4px solid var(--accent); border-radius: 10px; padding: 18px 20px; margin-bottom: 30px; max-width: 76ch">
+        <div style="font-size: 15px; font-weight: 800; margin-bottom: 8px; color: var(--accent-text)">Что делать на этом шаге</div>
+        <div style="font-size: 15px; line-height: 1.55; color: var(--ink-2)">Задания идут сверху вниз: <strong style="color: var(--ink)">2.1 схема процесса → 2.2 расчёт окупаемости → 2.3 запрос 1С → 2.4 сравнение «до / после»</strong>. У каждого есть блок «Что делать» — прочитай его и выполняй. Порядок можно не соблюдать.</div>
+      </div>
+
+      <div style="border: 1px solid var(--line); background: var(--panel); border-radius: 14px; overflow: hidden; margin-bottom: 20px">
+        <div style="padding: 20px 22px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: baseline; gap: 16px; flex-wrap: wrap">
+          <div>
+            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--dim); letter-spacing: 0.1em; text-transform: uppercase">Задание 2.1</div>
+            <h3 style="font-size: 21px; font-weight: 800; margin: 6px 0 0; letter-spacing: -0.02em">Найди 5 разрывов в схеме процесса</h3>
+          </div>
+          <div style="font-size: 15px; font-weight: 800; color: var(--accent-text); white-space: nowrap">Найдено {{ foundCount }} из 5</div>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr))">
+          <div style="padding: 24px; border-right: 1px solid var(--line)">
+            <div style="border: 1px solid var(--line); background: var(--panel-2); border-left: 4px solid var(--accent); border-radius: 8px; padding: 14px 16px; margin-bottom: 16px">
+              <div style="font-size: 14px; font-weight: 800; color: var(--accent-text); margin-bottom: 6px">Что делать</div>
+              <div style="font-size: 14px; line-height: 1.5; color: var(--ink-2)">ИИ описал бизнес-процесс «Согласование заявки на закупку» для внедрения в 1С. <strong style="color: var(--ink)">Нажимай мышкой на те шаги, где видишь разрыв или ошибку.</strong> Мерцающая пунктирная рамка — зона, по которой можно нажать. Ошибок ровно 5, справа появится объяснение.</div>
+            </div>
+            <sc-if value="{{ hintOn }}" hint-placeholder-val="{{ false }}">
+              <div style="border: 1px dashed var(--accent); border-radius: 8px; padding: 12px 14px; margin-bottom: 14px; font-size: 13.5px; line-height: 1.55; color: var(--ink-2)">Подсказка: ищи шаг без ответственного, шаг без срока, развилку с единственным выходом, повторный ручной ввод тех же данных и отсутствие контроля лимита бюджета.</div>
+            </sc-if>
+
+            <div style="background: var(--mock-bg); border: 1px solid var(--mock-line); border-radius: 10px; padding: 20px; color: var(--mock-ink); display: grid; gap: 10px">
+              <div onClick="{{ hit.clean1 }}" style="cursor: pointer; outline: 1px dashed var(--mock-line); outline-offset: 4px; border-radius: 4px; padding: 8px 10px">
+                <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--mock-dim); margin-bottom: 3px">ШАГ 1</div>
+                <div style="font-size: 14px; font-weight: 700">Сотрудник создаёт заявку на закупку</div>
+                <div style="font-size: 12.5px; color: var(--mock-dim); margin-top: 2px">Документ «ЗаявкаНаЗакупку», автор — текущий пользователь</div>
+              </div>
+
+              <div onClick="{{ hit.noRole }}" style="cursor: pointer; outline: {{ ring.noRole }}; outline-offset: 4px; border-radius: 4px; padding: 8px 10px; animation: {{ anim.noRole }}">
+                <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--accent-text); margin-bottom: 3px">ШАГ 2 — нажми</div>
+                <div style="font-size: 14px; font-weight: 700">Заявка уходит «на согласование руководителю»</div>
+                <div style="font-size: 12.5px; color: var(--mock-dim); margin-top: 2px">Исполнитель задачи: не указан</div>
+              </div>
+
+              <div onClick="{{ hit.noDeadline }}" style="cursor: pointer; outline: {{ ring.noDeadline }}; outline-offset: 4px; border-radius: 4px; padding: 8px 10px; animation: {{ anim.noDeadline }}">
+                <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--accent-text); margin-bottom: 3px">ШАГ 3 — нажми</div>
+                <div style="font-size: 14px; font-weight: 700">Согласующий рассматривает заявку</div>
+                <div style="font-size: 12.5px; color: var(--mock-dim); margin-top: 2px">Срок исполнения: не задан</div>
+              </div>
+
+              <div onClick="{{ hit.noReject }}" style="cursor: pointer; outline: {{ ring.noReject }}; outline-offset: 4px; border-radius: 4px; padding: 8px 10px; animation: {{ anim.noReject }}">
+                <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--accent-text); margin-bottom: 3px">ШАГ 4 — нажми</div>
+                <div style="font-size: 14px; font-weight: 700">Развилка: «Согласовано» → дальше</div>
+                <div style="font-size: 12.5px; color: var(--mock-dim); margin-top: 2px">Других вариантов у развилки нет</div>
+              </div>
+
+              <div onClick="{{ hit.noBudget }}" style="cursor: pointer; outline: {{ ring.noBudget }}; outline-offset: 4px; border-radius: 4px; padding: 8px 10px; animation: {{ anim.noBudget }}">
+                <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--accent-text); margin-bottom: 3px">ШАГ 5 — нажми</div>
+                <div style="font-size: 14px; font-weight: 700">Снабжение сразу оформляет заказ поставщику</div>
+                <div style="font-size: 12.5px; color: var(--mock-dim); margin-top: 2px">Лимит бюджета подразделения не проверяется</div>
+              </div>
+
+              <div onClick="{{ hit.manualReentry }}" style="cursor: pointer; outline: {{ ring.manualReentry }}; outline-offset: 4px; border-radius: 4px; padding: 8px 10px; animation: {{ anim.manualReentry }}">
+                <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--accent-text); margin-bottom: 3px">ШАГ 6 — нажми</div>
+                <div style="font-size: 14px; font-weight: 700">Бухгалтер вручную перебивает данные заявки в поступление</div>
+                <div style="font-size: 12.5px; color: var(--mock-dim); margin-top: 2px">Ввод «на основании» не используется</div>
+              </div>
+
+              <div onClick="{{ hit.clean2 }}" style="cursor: pointer; outline: 1px dashed var(--mock-line); outline-offset: 4px; border-radius: 4px; padding: 8px 10px">
+                <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--mock-dim); margin-bottom: 3px">ШАГ 7</div>
+                <div style="font-size: 14px; font-weight: 700">Автору заявки приходит уведомление о закрытии</div>
+                <div style="font-size: 12.5px; color: var(--mock-dim); margin-top: 2px">Результат фиксируется в истории документа</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="padding: 24px">
+            <div style="font-size: 16px; font-weight: 800; margin-bottom: 4px">Что ты нашёл</div>
+            <div style="font-size: 13.5px; line-height: 1.5; color: var(--ink-3); margin-bottom: 14px">Список заполняется сам, когда ты попадаешь по ошибке.</div>
+            <sc-if value="{{ msg }}" hint-placeholder-val="{{ false }}">
+              <div style="border: 1px solid {{ msgBorder }}; background: var(--panel-2); border-radius: 8px; padding: 12px 14px; font-size: 13.5px; line-height: 1.5; color: var(--ink-2); margin-bottom: 14px; animation: lab-pop 0.18s ease-out; text-wrap: pretty">{{ msg }}</div>
+            </sc-if>
+            <div style="display: grid; gap: 8px">
+              <sc-for list="{{ bugList }}" as="b" hint-placeholder-count="5">
+                <div style="border: 1px solid {{ b.border }}; background: var(--panel-2); border-radius: 8px; padding: 12px 14px">
+                  <div style="display: flex; gap: 10px; align-items: baseline">
+                    <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: {{ b.markColor }}">{{ b.mark }}</span>
+                    <span style="font-size: 14px; font-weight: 600; color: {{ b.titleColor }}">{{ b.title }}</span>
+                  </div>
+                  <sc-if value="{{ b.found }}" hint-placeholder-val="{{ false }}">
+                    <div style="margin-top: 6px; padding-left: 22px; font-size: 13px; line-height: 1.5; color: var(--ink-3); text-wrap: pretty">{{ b.why }}</div>
+                  </sc-if>
+                </div>
+              </sc-for>
+            </div>
+            <div style="display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap">
+              <button onClick="{{ toggleHint }}" style="background: var(--panel-3); border: 1px solid var(--line-2); color: var(--ink); border-radius: 8px; padding: 12px 18px; font-family: Manrope, sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; min-height: 44px" style-hover="border-color: var(--accent)">{{ hintLabel }}</button>
+              <button onClick="{{ resetBugs }}" style="background: transparent; border: 1px solid var(--line-2); color: var(--ink-2); border-radius: 8px; padding: 12px 18px; font-family: Manrope, sans-serif; font-size: 14px; cursor: pointer; min-height: 44px" style-hover="border-color: var(--dim); color: var(--ink)">Начать заново</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 20px; margin-bottom: 20px">
+        <div style="border: 1px solid var(--line); background: var(--panel); border-radius: 14px; padding: 22px">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--dim); letter-spacing: 0.1em; text-transform: uppercase">Задание 2.2</div>
+          <h3 style="font-size: 21px; font-weight: 800; margin: 6px 0 8px; letter-spacing: -0.02em">Посчитай окупаемость автоматизации</h3>
+          <div style="border: 1px solid var(--line); background: var(--panel-2); border-left: 4px solid var(--accent); border-radius: 8px; padding: 14px 16px; margin-bottom: 18px">
+            <div style="font-size: 14px; font-weight: 800; color: var(--accent-text); margin-bottom: 6px">Что делать</div>
+            <div style="font-size: 14px; line-height: 1.5; color: var(--ink-2)">ИИ написал в презентации: «автоматизация окупится за 2 месяца». Проверь это сам. Меняй числа в полях и добейся, чтобы <strong style="color: var(--ink)">срок окупаемости был 12 месяцев или меньше</strong> — тогда проект можно защищать перед заказчиком.</div>
+          </div>
+
+          <div style="display: grid; gap: 12px; margin-bottom: 18px">
+            <sc-for list="{{ roiFields }}" as="f" hint-placeholder-count="5">
+              <label style="display: grid; grid-template-columns: minmax(0, 1fr) 130px; align-items: center; gap: 14px; font-size: 14px; color: var(--ink-2)">
+                <span>{{ f.label }}</span>
+                <input type="number" value="{{ f.value }}" onChange="{{ f.set }}" style="width: 130px; background: var(--field); border: 1px solid var(--line-2); border-radius: 6px; padding: 11px 12px; color: var(--ink); font-family: 'IBM Plex Mono', monospace; font-size: 14px; min-height: 44px" />
+              </label>
+            </sc-for>
+          </div>
+
+          <div style="background: var(--panel-2); border: 1px solid var(--line-2); border-radius: 10px; padding: 16px; display: grid; gap: 10px">
+            <div style="display: flex; justify-content: space-between; gap: 12px; font-size: 14px"><span style="color: var(--ink-3)">Экономия времени</span><span style="font-family: 'IBM Plex Mono', monospace; font-weight: 600">{{ savedHours }} ч / мес</span></div>
+            <div style="display: flex; justify-content: space-between; gap: 12px; font-size: 14px"><span style="color: var(--ink-3)">Экономия в деньгах</span><span style="font-family: 'IBM Plex Mono', monospace; font-weight: 600">{{ savedMoney }} ₽ / мес</span></div>
+            <div style="height: 1px; background: var(--line)"></div>
+            <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap">
+              <span style="font-size: 14px; font-weight: 700">Срок окупаемости</span>
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 28px; font-weight: 600; color: {{ paybackColor }}">{{ paybackText }}</span>
+            </div>
+            <div style="height: 8px; background: var(--line-3); border-radius: 4px; position: relative; overflow: hidden">
+              <div style="position: absolute; inset: 0 auto 0 0; background: {{ paybackColor }}; border-radius: 4px; transition: width 0.35s ease, background 0.35s ease; width: {{ paybackPct }}"></div>
+              <div style="position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--ink); opacity: 0.7; left: 50%"></div>
+            </div>
+            <div style="font-size: 12.5px; color: var(--ink-3)">↑ отметка в середине — граница 12 месяцев. Полоска должна остаться левее.</div>
+            <div style="font-size: 14px; font-weight: 600; line-height: 1.5; color: {{ paybackColor }}; text-wrap: pretty">{{ paybackVerdict }}</div>
+          </div>
+
+          <button onClick="{{ resetRoi }}" style="margin-top: 14px; background: transparent; border: 1px solid var(--line-2); color: var(--ink-2); border-radius: 8px; padding: 12px 18px; font-family: Manrope, sans-serif; font-size: 14px; cursor: pointer; min-height: 44px" style-hover="border-color: var(--dim); color: var(--ink)">Вернуть исходные цифры</button>
+        </div>
+
+        <div style="border: 1px solid var(--line); background: var(--panel); border-radius: 14px; padding: 22px">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--dim); letter-spacing: 0.1em; text-transform: uppercase">Задание 2.3</div>
+          <h3 style="font-size: 21px; font-weight: 800; margin: 6px 0 8px; letter-spacing: -0.02em">Почини запрос, который написал ИИ</h3>
+          <div style="border: 1px solid var(--line); background: var(--panel-2); border-left: 4px solid var(--accent); border-radius: 8px; padding: 14px 16px; margin-bottom: 14px">
+            <div style="font-size: 14px; font-weight: 800; color: var(--accent-text); margin-bottom: 6px">Что делать — 4 правки</div>
+            <div style="font-size: 14px; line-height: 1.6; color: var(--ink-2)">1. Убрать <span style="font-family: 'IBM Plex Mono', monospace">*</span> и перечислить нужные поля через запятую<br />2. Заменить соединение через запятую на <span style="font-family: 'IBM Plex Mono', monospace">ЛЕВОЕ СОЕДИНЕНИЕ … ПО …</span><br />3. Добавить отбор: <span style="font-family: 'IBM Plex Mono', monospace">ГДЕ Заявка.Дата МЕЖДУ &amp;НачалоПериода И &amp;КонецПериода</span><br />4. Передать дату в саму виртуальную таблицу: <span style="font-family: 'IBM Plex Mono', monospace">.Остатки(&amp;КонецПериода, )</span><br />Затем нажми жёлтую кнопку «Проверить».</div>
+          </div>
+          <textarea value="{{ code }}" onChange="{{ setCode }}" spellcheck="false" style="width: 100%; min-height: 230px; background: var(--field); border: 1px solid var(--line-2); border-radius: 8px; padding: 14px; color: var(--ink-2); font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; line-height: 1.6; resize: vertical"></textarea>
+          <div style="display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap">
+            <button onClick="{{ checkCode }}" style="background: var(--accent); color: var(--on-accent); border: 0; border-radius: 8px; padding: 12px 18px; font-family: Manrope, sans-serif; font-size: 15px; font-weight: 800; cursor: pointer; min-height: 48px" style-hover="background: var(--accent-hi)">✓ Проверить мой запрос</button>
+            <button onClick="{{ resetCode }}" style="background: transparent; border: 1px solid var(--line-2); color: var(--ink-2); border-radius: 8px; padding: 12px 18px; font-family: Manrope, sans-serif; font-size: 14px; cursor: pointer; min-height: 48px" style-hover="border-color: var(--dim); color: var(--ink)">Вернуть как было</button>
+          </div>
+          <div style="margin-top: 14px; display: grid; gap: 8px">
+            <sc-for list="{{ codeResults }}" as="r" hint-placeholder-count="4">
+              <div style="display: flex; gap: 10px; align-items: baseline; font-size: 13.5px; line-height: 1.5">
+                <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: {{ r.color }}">{{ r.mark }}</span>
+                <span style="color: var(--ink-2); text-wrap: pretty">{{ r.label }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+
+      <div style="border: 1px solid var(--line); background: var(--panel); border-radius: 14px; padding: 22px 22px 26px">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--dim); letter-spacing: 0.1em; text-transform: uppercase">Задание 2.4</div>
+        <h3 style="font-size: 21px; font-weight: 800; margin: 6px 0 8px; letter-spacing: -0.02em">Сравни процесс «до» и «после»</h3>
+        <div style="border: 1px solid var(--line); background: var(--panel-2); border-left: 4px solid var(--accent); border-radius: 8px; padding: 14px 16px; margin-bottom: 18px; max-width: 74ch">
+          <div style="font-size: 14px; font-weight: 800; color: var(--accent-text); margin-bottom: 6px">Что делать</div>
+          <div style="font-size: 14px; line-height: 1.5; color: var(--ink-2)">Прочитай две колонки построчно: <strong style="color: var(--ink)">слева</strong> — как счёт поставщика обрабатывают вручную сегодня, <strong style="color: var(--ink)">справа</strong> — та же работа после доработки в 1С. Ниже выписано, что именно изменилось и откуда берутся цифры для задания 2.2.</div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px">
+          <div style="background: var(--mock-bg); border: 1px solid var(--mock-line); border-radius: 10px; padding: 22px; color: var(--mock-ink)">
+            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.12em; color: var(--mock-dim); margin-bottom: 8px">ДО — ВРУЧНУЮ</div>
+            <div style="font-size: 19px; font-weight: 800; margin-bottom: 16px">Счёт от поставщика: как сейчас</div>
+            <div style="display: grid; gap: 12px">
+              <sc-for list="{{ before }}" as="b" hint-placeholder-count="5">
+                <div style="display: flex; gap: 10px; align-items: flex-start; min-height: 46px">
+                  <span style="flex: none; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--mock-dim); padding-top: 2px">{{ b.n }}</span>
+                  <span style="font-size: 14px; line-height: 1.45; color: var(--mock-dim); text-wrap: pretty">{{ b.text }}</span>
+                </div>
+              </sc-for>
+            </div>
+            <div style="margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--mock-line); font-size: 14px; color: var(--mock-dim)">12 минут на счёт · 3 участника · контроль в Excel</div>
+          </div>
+
+          <div style="background: var(--mock-bg); border: 1px solid var(--accent); border-radius: 10px; padding: 22px; color: var(--mock-ink)">
+            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.12em; color: var(--accent-text); margin-bottom: 8px">ПОСЛЕ — ДОРАБОТКА В 1С</div>
+            <div style="font-size: 19px; font-weight: 800; margin-bottom: 16px">Счёт от поставщика: как станет</div>
+            <div style="display: grid; gap: 12px">
+              <sc-for list="{{ after }}" as="a" hint-placeholder-count="5">
+                <div style="display: flex; gap: 10px; align-items: flex-start; min-height: 46px">
+                  <span style="flex: none; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--accent-text); padding-top: 2px">{{ a.n }}</span>
+                  <span style="font-size: 14px; line-height: 1.45; color: var(--mock-ink); text-wrap: pretty">{{ a.text }}</span>
+                </div>
+              </sc-for>
+            </div>
+            <div style="margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--mock-line); font-size: 14px; font-weight: 700">3 минуты на счёт · 2 участника · контроль отчётом в 1С</div>
+          </div>
+        </div>
+
+        <div style="margin-top: 8px; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px">
+          <sc-for list="{{ diffs }}" as="d" hint-placeholder-count="4">
+            <div style="border-top: 2px solid var(--accent); padding-top: 10px">
+              <div style="font-size: 14px; font-weight: 800; margin-bottom: 4px">{{ d.title }}</div>
+              <div style="font-size: 13px; line-height: 1.5; color: var(--ink-3); text-wrap: pretty">{{ d.text }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="margin-top: 30px; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap">
+        <button onClick="{{ go.l1 }}" style="background: transparent; border: 1px solid var(--line-2); color: var(--ink); border-radius: 8px; padding: 14px 22px; font-family: Manrope, sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; min-height: 48px" style-hover="border-color: var(--dim)">← Назад к шагу 1</button>
+        <button onClick="{{ go.l3 }}" style="background: var(--accent); color: var(--on-accent); border: 0; border-radius: 8px; padding: 16px 26px; font-family: Manrope, sans-serif; font-size: 16px; font-weight: 800; cursor: pointer; min-height: 52px" style-hover="background: var(--accent-hi)">Дальше: шаг 3 · Проект →</button>
+      </div>
+    </section>
+    </sc-if>
+
+    <sc-if value="{{ isL3 }}" hint-placeholder-val="{{ false }}">
+    <section style="padding: 48px 0 40px">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--accent-text); letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 12px">Шаг 3 · Проект</div>
+      <h2 style="font-size: clamp(26px, 3.6vw, 36px); font-weight: 800; letter-spacing: -0.03em; margin: 0 0 14px">Проект: постановка задачи для ИИ</h2>
+      <div style="border: 1px solid var(--line); background: var(--panel); border-left: 4px solid var(--accent); border-radius: 10px; padding: 18px 20px; margin-bottom: 28px; max-width: 76ch">
+        <div style="font-size: 15px; font-weight: 800; margin-bottom: 8px; color: var(--accent-text)">Задача</div>
+        <div style="font-size: 15px; line-height: 1.55; color: var(--ink-2)">Заказчик просит <strong style="color: var(--ink)">автоматизировать согласование заявок на закупку в 1С</strong>. Нажимай на кнопки-требования слева — из них соберётся готовая постановка задачи для ИИ. Цель: набрать все 6 обязательных требований и не брать пустые формулировки. Подпись внизу подскажет, чего не хватает.</div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px">
+        <div style="border: 1px solid var(--line); background: var(--panel); border-radius: 14px; padding: 22px">
+          <div style="font-size: 16px; font-weight: 800; margin-bottom: 4px">Шаг А. Нажми на нужные требования</div>
+          <div style="font-size: 13.5px; line-height: 1.5; color: var(--ink-3); margin-bottom: 14px">Выбрано {{ chosenCount }} из 8. Жёлтая кнопка = требование добавлено. Нажми ещё раз, чтобы убрать.</div>
+          <div style="display: flex; flex-wrap: wrap; gap: 8px">
+            <sc-for list="{{ chips }}" as="ch" hint-placeholder-count="8">
+              <button onClick="{{ ch.toggle }}" style="background: {{ ch.bg }}; border: 1px solid {{ ch.border }}; color: {{ ch.color }}; border-radius: 20px; padding: 10px 14px; font-family: Manrope, sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; min-height: 44px" style-hover="border-color: var(--dim)">{{ ch.label }}</button>
+            </sc-for>
+          </div>
+          <div style="margin-top: 20px; font-size: 16px; font-weight: 800; margin-bottom: 4px">Шаг Б. Читай, что получилось</div>
+          <div style="font-size: 13.5px; line-height: 1.5; color: var(--ink-3); margin-bottom: 8px">Это и есть твоя постановка задачи — её можно скопировать и отдать ИИ.</div>
+          <div style="background: var(--field); border: 1px solid var(--line-2); border-radius: 8px; padding: 14px; font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; line-height: 1.7; color: var(--ink-2); min-height: 130px; white-space: pre-wrap">{{ promptText }}</div>
+          <div style="margin-top: 12px; font-size: 14px; font-weight: 600; line-height: 1.55; color: {{ verdictColor }}; text-wrap: pretty">{{ verdict }}</div>
+        </div>
+
+        <div style="border: 1px solid var(--line); background: var(--panel); border-radius: 14px; padding: 22px">
+          <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 14px">
+            <div>
+              <div style="font-size: 16px; font-weight: 800; margin-bottom: 4px">Шаг В. Проверь результат по чек-листу приёмки</div>
+              <div style="font-size: 13.5px; line-height: 1.5; color: var(--ink-3)">10 пунктов, по которым доработку в 1С принимают у исполнителя. Нажимай на строку, если пункт выполнен. Нужно отметить минимум 8.</div>
+            </div>
+            <div style="font-size: 15px; font-weight: 800; color: var(--accent-text); white-space: nowrap">{{ checklistCount }} / 10</div>
+          </div>
+          <div style="display: grid; gap: 6px">
+            <sc-for list="{{ checklist }}" as="n" hint-placeholder-count="10">
+              <button onClick="{{ n.toggle }}" style="text-align: left; display: flex; gap: 10px; align-items: flex-start; background: transparent; border: 0; border-bottom: 1px solid var(--line-3); color: var(--ink); padding: 10px 2px; font-family: Manrope, sans-serif; font-size: 13.5px; line-height: 1.45; cursor: pointer; min-height: 44px" style-hover="background: var(--panel-2)">
+                <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: {{ n.markColor }}; flex: none; width: 16px">{{ n.mark }}</span>
+                <span style="color: {{ n.color }}; text-wrap: pretty">{{ n.text }}</span>
+              </button>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top: 20px; border: 1px solid var(--line); background: var(--panel); border-radius: 14px; padding: 22px">
+        <h3 style="font-size: 19px; font-weight: 800; margin: 0 0 6px; letter-spacing: -0.02em">Шаг Г. Напиши вывод (его читает преподаватель)</h3>
+        <p style="font-size: 15px; line-height: 1.55; color: var(--ink-2); margin: 0 0 14px; max-width: 72ch; text-wrap: pretty">Вопрос: где ИИ выдал правдоподобный, но нерабочий результат? Приведи пример из заданий шага 2 и объясни, чем это грозит заказчику. Хватит 3–5 предложений. Текст сохраняется сам.</p>
+        <textarea value="{{ reflection }}" onChange="{{ setReflection }}" placeholder="Мой ответ…" style="width: 100%; min-height: 140px; background: var(--field); border: 1px solid var(--line-2); border-radius: 8px; padding: 14px; color: var(--ink); font-family: Manrope, sans-serif; font-size: 15px; line-height: 1.6; resize: vertical"></textarea>
+        <div style="margin-top: 8px; font-size: 13px; color: var(--ink-3)">Сохранено автоматически · написано {{ reflectionLen }} символов</div>
+      </div>
+
+      <div style="margin-top: 30px; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap">
+        <button onClick="{{ go.l2 }}" style="background: transparent; border: 1px solid var(--line-2); color: var(--ink); border-radius: 8px; padding: 14px 22px; font-family: Manrope, sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; min-height: 48px" style-hover="border-color: var(--dim)">← Назад к шагу 2</button>
+        <button onClick="{{ go.map }}" style="background: var(--accent); color: var(--on-accent); border: 0; border-radius: 8px; padding: 14px 22px; font-family: Manrope, sans-serif; font-size: 15px; font-weight: 800; cursor: pointer; min-height: 48px" style-hover="background: var(--accent-hi)">Готово — на главную ✓</button>
+      </div>
+    </section>
+    </sc-if>
+
+  </main>
+
+  <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+    <div role="status" style="position: fixed; left: 50%; bottom: 26px; transform: translateX(-50%); z-index: 60; background: var(--panel); border: 1px solid var(--ok); border-left: 4px solid var(--ok); border-radius: 10px; padding: 14px 20px; box-shadow: 0 12px 32px rgba(0,0,0,0.35); animation: lab-pop 0.22s ease-out; display: flex; gap: 12px; align-items: center">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; color: var(--ok)">✓</span>
+      <span style="font-size: 14px; font-weight: 600; color: var(--ink)">{{ toast }}</span>
+    </div>
+  </sc-if>
+
+  <footer style="border-top: 1px solid var(--line); background: var(--footer); margin-top: 40px">
+    <div style="max-width: 1180px; margin: 0 auto; padding: 32px 24px 44px; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 28px">
+      <div>
+        <div style="font-weight: 800; font-size: 15px; margin-bottom: 8px">1С Lab: ИИ под проверкой</div>
+        <div style="font-size: 13px; line-height: 1.6; color: var(--dim); text-wrap: pretty">Электронный образовательный ресурс. Специальность <strong style="color: var(--ink-2)">09.02.11 «Разработка и управление программным обеспечением»</strong>. Дисциплина <strong style="color: var(--ink-2)">ДПБ 1, ОП.13 «Автоматизация бизнес-процессов»</strong>. Сквозной модуль по применению технологий ИИ.</div>
+        <div style="margin-top: 10px; font-size: 12px; line-height: 1.6; color: var(--dim); text-wrap: pretty">Реальных обращений к ИИ-сервисам ресурс не выполняет: весь «ИИ»-контент подготовлен заранее.</div>
+      </div>
+      <div>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--dim); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 10px">Нормативное обоснование</div>
+        <div style="display: grid; gap: 7px; font-size: 12.5px; line-height: 1.5; color: var(--dim)">
+          <span>Методические рекомендации ФГБОУ ДПО ИРПО по применению технологий ИИ в рамках модуля в соответствии с ФГОС СПО (2025)</span>
+          <span>Указ Президента РФ от 10.10.2019 № 490</span>
+          <span>Распоряжение Правительства РФ от 28.07.2017 № 1632-р</span>
+          <span>Приказ Минпросвещения России от 24.08.2022 № 762</span>
+          <span>ФГОС СПО 09.02.11 «Разработка и управление программным обеспечением»</span>
+          <span>Рабочая программа дисциплины ОП.13 «Автоматизация бизнес-процессов»</span>
+        </div>
+      </div>
+      <div>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--dim); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 10px">Доступность</div>
+        <div style="font-size: 13px; line-height: 1.6; color: var(--dim); margin-bottom: 12px">Масштаб интерфейса:</div>
+        <div style="display: flex; gap: 8px">
+          <button onClick="{{ fontS }}" aria-label="Обычный масштаб" style="background: {{ fsBg1 }}; border: 1px solid var(--line-2); color: var(--ink); border-radius: 6px; min-width: 44px; min-height: 44px; font-family: Manrope, sans-serif; font-size: 13px; cursor: pointer">A</button>
+          <button onClick="{{ fontM }}" aria-label="Увеличенный масштаб" style="background: {{ fsBg2 }}; border: 1px solid var(--line-2); color: var(--ink); border-radius: 6px; min-width: 44px; min-height: 44px; font-family: Manrope, sans-serif; font-size: 15px; cursor: pointer">A</button>
+          <button onClick="{{ fontL }}" aria-label="Крупный масштаб" style="background: {{ fsBg3 }}; border: 1px solid var(--line-2); color: var(--ink); border-radius: 6px; min-width: 44px; min-height: 44px; font-family: Manrope, sans-serif; font-size: 18px; cursor: pointer">A</button>
+        </div>
+      </div>
+    </div>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;: {&quot;width&quot;: 1280, &quot;height&quot;: 900}}">
+class Component extends DCLogic {
+  BROKEN = 'ВЫБРАТЬ *\nИЗ\n    Документ.ЗаявкаНаЗакупку КАК Заявка,\n    РегистрНакопления.ТоварыНаСкладах.Остатки КАК Остатки\n\nУПОРЯДОЧИТЬ ПО\n    Заявка.Дата';
+
+  BUGS = [
+    { id: 'noRole', title: 'Шаг без ответственного', why: 'В схеме не сказано, кто именно согласует. В 1С задача адресуется по ролевой адресации (роль, подразделение), иначе задача не создастся ни у кого.' },
+    { id: 'noDeadline', title: 'Шаг без срока исполнения', why: 'Без срока задача висит бесконечно, и процесс нельзя контролировать. У задачи должен быть срок и правило эскалации при просрочке.' },
+    { id: 'noReject', title: 'У развилки один выход', why: 'Нет ветки «Отклонено» и «Вернуть на доработку». Процесс с единственным выходом попадает в тупик при отказе руководителя.' },
+    { id: 'noBudget', title: 'Нет контроля лимита бюджета', why: 'Заказ уходит поставщику без проверки лимита подразделения. Автоматизация без контроля превращает ошибку в быструю ошибку.' },
+    { id: 'manualReentry', title: 'Повторный ручной ввод данных', why: 'Бухгалтер перебивает то, что уже есть в системе. Нужен ввод «на основании»: поступление создаётся из заявки без ручного переноса.' }
+  ];
+
+  CLEAN = {
+    clean1: 'Первый шаг описан нормально: есть документ, есть автор. Это не ошибка — ищи дальше.',
+    clean2: 'Уведомление автору и запись в историю документа — правильная часть процесса.'
+  };
+
+  CARDS = [
+    { tag: 'Код · встроенный язык', title: 'ИИ пишет код на языке 1С', body: 'По описанию задачи выдаёт обработку, процедуру модуля объекта или регламентное задание за минуты.', trap: 'Не знает вашу конфигурацию: придумывает несуществующие реквизиты и методы, ломает поддержку и обновление типовой конфигурации.', accent: 'var(--accent)' },
+    { tag: 'Данные · язык запросов', title: 'Генерация запросов и отчётов', body: 'Быстро собирает запрос к регистрам и справочникам, помогает с СКД.', trap: 'Пишет «читаемый», но тяжёлый запрос: соединение через запятую, отбор в ГДЕ вместо параметров виртуальной таблицы — на реальных объёмах отчёт встаёт.' },
+    { tag: 'Процессы', title: 'Описание бизнес-процесса', body: 'Превращает разговор с заказчиком в аккуратную пошаговую схему согласования.', trap: 'Схема выглядит стройно, но в ней нет отказов, сроков и ответственных — того, без чего процесс не работает в жизни.', accent: 'var(--accent)' },
+    { tag: 'Документы', title: 'Распознавание и загрузка', body: 'ИИ-распознавание счетов и накладных экономит часы ручного ввода.', trap: 'Ошибается в номенклатуре и суммах. Без сверки с заявкой и без контроля расхождений ошибка попадает прямо в учёт.', accent: 'var(--cyan)' },
+    { tag: 'Аналитика', title: 'Прогнозы и «ИИ-выводы»', body: 'Помогает быстро сформулировать гипотезы по данным: спрос, загрузка, остатки.', trap: 'Уверенно считает по неполным данным и не показывает допущения. Цифру из презентации нужно пересчитывать самому.', accent: 'var(--cyan)' },
+    { tag: 'Граница доверия', title: 'Что нельзя делегировать', body: 'Ответственность за соответствие ТЗ, права доступа и сохранность данных остаётся за разработчиком.', trap: 'ИИ не отвечает за коммерческую тайну, персональные данные и то, что доработка выживет при обновлении конфигурации. Проверка — обязательный этап.', accent: 'var(--cyan)' }
+  ];
+
+  QUESTIONS = [
+    { text: 'ИИ выдал готовый код обработки для вашей конфигурации 1С. Что делать в первую очередь?', options: ['Проверить, что реквизиты и методы реально существуют в конфигурации, и прогнать на тестовой базе', 'Сразу опубликовать в рабочей базе — код компилируется', 'Показать заказчику: если не заметит ошибок, значит их нет'], correct: 0, explain: 'ИИ не видит вашу конфигурацию. Сначала сверка метаданных и запуск на копии базы, потом рабочая база.' },
+    { text: 'В презентации ИИ написал: «автоматизация окупится за 2 месяца». Что это значит?', options: ['Что расчёт верен — модель обучена на реальных проектах', 'Что цифру нужно пересчитать самому по данным заказчика и показать допущения', 'Что срок можно смело внести в договор'], correct: 1, explain: 'Прогноз без исходных данных и допущений — не расчёт. Считать окупаемость вы будете сами, этим и занято задание 2.2.' },
+    { text: 'Можно ли отдавать ИИ-сервису выгрузку из рабочей базы 1С, чтобы он «разобрался»?', options: ['Да, если сервис популярный', 'Да, но только по вечерам, когда база свободна', 'Нет: там персональные данные и коммерческая тайна — нужны обезличенные тестовые данные'], correct: 2, explain: 'Данные заказчика не покидают контур. Для экспериментов готовят обезличенный тестовый набор.' }
+  ];
+
+  CHIPS = [
+    { id: 'goal', label: 'Цель и владелец процесса', line: 'Цель: сократить срок согласования заявки на закупку с 3 дней до 1. Владелец процесса — руководитель отдела снабжения.', key: true },
+    { id: 'meta', label: 'Объекты конфигурации', line: 'Использовать документ «ЗаявкаНаЗакупку», бизнес-процесс и задачу, регистр сведений «ЛимитыБюджета». Типовые объекты не снимать с поддержки.', key: true },
+    { id: 'route', label: 'Маршрут, роли и сроки', line: 'Маршрут: автор → согласование по роли «Руководитель подразделения» (срок 8 рабочих часов) → проверка лимита → снабжение. Ветки «Отклонено» и «На доработку» обязательны.', key: true },
+    { id: 'rights', label: 'Права доступа', line: 'Права: автор видит только свои заявки, руководитель — заявки подразделения (ограничение на уровне записей), снабжение — согласованные.', key: true },
+    { id: 'integration', label: 'Обмен и интеграция', line: 'Поступление создаётся вводом на основании заявки; счёт принимается из ЭДО без повторного ручного ввода.', key: true },
+    { id: 'accept', label: 'Критерии приёмки и тестовые данные', line: 'Приёмка: 20 заявок в тестовой базе проходят все ветки маршрута, отчёт по срокам сходится. Данные обезличенные.', key: true },
+    { id: 'load', label: 'Объём данных и нагрузка', line: 'Расчёт на 1500 заявок в месяц и 60 одновременных пользователей; отчёт формируется не дольше 5 секунд.', key: false },
+    { id: 'trendy', label: 'Сделать по-современному', line: 'Сделай современно, удобно и с использованием ИИ.', key: false }
+  ];
+
+  CHECKLIST = [
+    'Все ветки маршрута проходятся на тестовой базе, включая отказ и доработку',
+    'У каждой задачи есть ответственный по роли и срок исполнения',
+    'Проверка лимита бюджета срабатывает до отправки заказа поставщику',
+    'Повторного ручного ввода нет: документы создаются вводом на основании',
+    'Права доступа проверены под каждой ролью, включая ограничение по записям',
+    'Типовые объекты не сняты с поддержки, доработки вынесены в расширение',
+    'Ошибки обрабатываются и пишутся в журнал регистрации, а не молча гаснут',
+    'Отчёт по срокам согласования сходится с данными за тестовый период',
+    'Пользователи получили короткую инструкцию по новому процессу',
+    'В тестах использованы обезличенные данные, выгрузки рабочей базы не передавались'
+  ];
+
+  DEFAULT_ROI = { docs: 400, before: 12, after: 9, rate: 600, cost: 250000 };
+
+  state = {
+    tab: 'map', done: {}, openCard: null, picks: {}, found: {}, msg: '', msgOk: true,
+    roi: Object.assign({}, this.DEFAULT_ROI),
+    code: this.BROKEN, codeResults: [],
+    chosen: {}, checked: {}, reflection: '', fs: 1,
+    theme: 'dark', typed: '', toast: '', hintOn: false
+  };
+
+  PROMPTS = [
+    'напиши обработку выгрузки заявок',
+    'составь запрос по остаткам склада',
+    'опиши процесс согласования закупки'
+  ];
+
+  TITLES = {
+    quiz: 'Шаг 1 пройден — теория зачтена',
+    bugs: 'Все 5 разрывов найдены — задание 2.1 зачтено',
+    roi: 'Окупаемость уложилась в 12 месяцев — задание 2.2 зачтено',
+    code: 'Запрос исправлен — задание 2.3 зачтено',
+    prompt: 'Постановка задачи собрана — шаг 3',
+    checklist: 'Чек-лист приёмки пройден'
+  };
+
+  KEY = 'onecLab.progress.v1';
+
+  componentDidMount() {
+    try {
+      const raw = localStorage.getItem(this.KEY);
+      if (raw) {
+        const s = JSON.parse(raw);
+        this.setState({
+          done: s.done || {}, reflection: s.reflection || '', checked: s.checked || {},
+          chosen: s.chosen || {}, fs: s.fs || 1, theme: s.theme || 'dark'
+        });
+      }
+    } catch (e) {}
+    this.ti = 0; this.ci = 0; this.erasing = false; this.hold = 0;
+    this.timer = setInterval(() => {
+      const full = this.PROMPTS[this.ti % this.PROMPTS.length];
+      if (!this.erasing) {
+        this.ci += 1;
+        if (this.ci >= full.length) { this.erasing = true; this.hold = 14; }
+      } else if (this.hold > 0) { this.hold -= 1; return; }
+      else {
+        this.ci -= 2;
+        if (this.ci <= 0) { this.ci = 0; this.erasing = false; this.ti += 1; }
+      }
+      this.setState({ typed: this.PROMPTS[this.ti % this.PROMPTS.length].slice(0, Math.max(0, this.ci)) });
+    }, 70);
+  }
+
+  componentWillUnmount() { clearInterval(this.timer); clearTimeout(this.toastTimer); }
+
+  componentDidUpdate() { this.audit(); }
+
+  audit() {
+    const st = this.state;
+    if (this.payback() !== null && this.payback() <= 12) this.mark('roi');
+    if (Object.keys(st.checked).filter((k) => st.checked[k]).length >= 8) this.mark('checklist');
+    if (this.QUESTIONS.filter((q, i) => st.picks[i] === q.correct).length === 3) this.mark('quiz');
+    const keyHits = this.CHIPS.filter((c) => c.key && st.chosen[c.id]).length;
+    if (keyHits === 6 && !st.chosen.trendy) this.mark('prompt');
+  }
+
+  persist(extra) {
+    const s = Object.assign({
+      done: this.state.done, reflection: this.state.reflection, checked: this.state.checked,
+      chosen: this.state.chosen, fs: this.state.fs, theme: this.state.theme
+    }, extra || {});
+    try { localStorage.setItem(this.KEY, JSON.stringify(s)); } catch (e) {}
+  }
+
+  mark(id) {
+    if (this.state.done[id]) return;
+    const done = Object.assign({}, this.state.done, { [id]: true });
+    this.setState({ done, toast: this.TITLES[id] || 'Задание зачтено' });
+    this.persist({ done });
+    clearTimeout(this.toastTimer);
+    this.toastTimer = setTimeout(() => this.setState({ toast: '' }), 3600);
+  }
+
+  savedHours() {
+    const r = this.state.roi;
+    const delta = Number(r.before) - Number(r.after);
+    const h = (Number(r.docs) * delta) / 60;
+    return isFinite(h) ? h : 0;
+  }
+
+  savedMoney() { return this.savedHours() * Number(this.state.roi.rate); }
+
+  payback() {
+    const m = this.savedMoney();
+    const cost = Number(this.state.roi.cost);
+    if (!isFinite(m) || m <= 0 || !isFinite(cost) || cost < 0) return null;
+    return cost / m;
+  }
+
+  runCode() {
+    const c = this.state.code;
+    const commaJoin = /ИЗ[\s\S]*?КАК\s+[А-Яа-яA-Za-z_0-9]+\s*,/i.test(c);
+    const checks = [
+      { label: 'Звёздочка убрана — выбираются конкретные поля', ok: !/ВЫБРАТЬ[\s\S]{0,40}\*/i.test(c) },
+      { label: 'Используется ЛЕВОЕ СОЕДИНЕНИЕ … ПО, а не соединение через запятую', ok: /ЛЕВОЕ\s+СОЕДИНЕНИЕ/i.test(c) && /\sПО\s/i.test(c) && !commaJoin },
+      { label: 'Есть отбор по периоду через параметры (ГДЕ … &Параметр)', ok: /ГДЕ[\s\S]*&[А-Яа-яA-Za-z_0-9]+/i.test(c) },
+      { label: 'Дата передана в параметры виртуальной таблицы: Остатки(&…)', ok: /Остатки\s*\(\s*&/i.test(c) }
+    ];
+    this.setState({ codeResults: checks });
+    if (checks.every((x) => x.ok)) this.mark('code');
+  }
+
+  hitZone(id) {
+    if (this.CLEAN[id]) { this.setState({ msg: this.CLEAN[id], msgOk: false }); return; }
+    const bug = this.BUGS.find((b) => b.id === id);
+    if (!bug) return;
+    const found = Object.assign({}, this.state.found, { [id]: true });
+    this.setState({ found, msg: 'Верно: ' + bug.title.toLowerCase() + '. ' + bug.why, msgOk: true });
+    if (Object.keys(found).length === this.BUGS.length) this.mark('bugs');
+  }
+
+  fmt(n) {
+    if (!isFinite(n)) return '—';
+    return Math.round(n).toLocaleString('ru-RU');
+  }
+
+  renderVals() {
+    const st = this.state;
+    const ids = ['noRole', 'noDeadline', 'noReject', 'noBudget', 'manualReentry'];
+    const doneCount = Object.keys(st.done).length;
+    const foundCount = Object.keys(st.found).length;
+
+    const ring = {}, anim = {}, hit = {};
+    ids.forEach((id) => {
+      ring[id] = st.found[id] ? '2px solid var(--ok)' : '1px dashed var(--accent)';
+      anim[id] = st.found[id] ? 'none' : 'lab-breathe 3.2s ease-in-out infinite';
+    });
+    ids.concat(['clean1', 'clean2']).forEach((id) => { hit[id] = () => this.hitZone(id); });
+
+    const pb = this.payback();
+    let paybackVerdict, paybackColor;
+    if (pb === null) { paybackVerdict = 'Экономии нет: после автоматизации времени уходит столько же или больше. Уменьши минуты «после».'; paybackColor = 'var(--bad)'; }
+    else if (pb <= 12) { paybackVerdict = 'Окупаемость ' + pb.toFixed(1) + ' мес — проект защитить можно. Задание зачтено.'; paybackColor = 'var(--ok)'; }
+    else { paybackVerdict = 'Окупаемость ' + pb.toFixed(1) + ' мес — дольше года. Либо экономия мала, либо внедрение слишком дорогое.'; paybackColor = 'var(--bad)'; }
+
+    const roiMeta = [
+      { id: 'docs', label: 'Документов в месяц, шт' },
+      { id: 'before', label: 'Минут на документ сейчас' },
+      { id: 'after', label: 'Минут на документ после доработки' },
+      { id: 'rate', label: 'Стоимость часа сотрудника, ₽' },
+      { id: 'cost', label: 'Стоимость доработки в 1С, ₽' }
+    ];
+
+    const chosenIds = this.CHIPS.filter((c) => st.chosen[c.id]);
+    const promptText = chosenIds.length
+      ? 'Задача: автоматизировать согласование заявок на закупку в 1С.\n\n' + chosenIds.map((c) => '— ' + c.line).join('\n')
+      : 'Нажимай на требования слева — постановка задачи соберётся здесь.';
+    const keyHits = this.CHIPS.filter((c) => c.key && st.chosen[c.id]).length;
+    const hasFluff = !!st.chosen.trendy;
+    let verdict, verdictColor;
+    if (keyHits === 0) { verdict = 'Пока это не постановка задачи. Без цели, объектов конфигурации и критериев приёмки ИИ придумает всё сам.'; verdictColor = 'var(--dim)'; }
+    else if (keyHits < 6) { verdict = 'Покрыто ' + keyHits + ' из 6 обязательных требований. Чего-то не хватает — ИИ заполнит пробелы по своему усмотрению.'; verdictColor = 'var(--accent-text)'; }
+    else if (hasFluff) { verdict = 'Требования собраны полностью, но «сделать по-современному» ничего не задаёт и проверить это нельзя — такую формулировку лучше убрать.'; verdictColor = 'var(--accent-text)'; }
+    else { verdict = 'Это уже техзадание: каждое требование можно проверить при приёмке. Задание зачтено.'; verdictColor = 'var(--ok)'; }
+
+    const checklistCount = Object.keys(st.checked).filter((k) => st.checked[k]).length;
+    const quizScore = this.QUESTIONS.filter((q, i) => st.picks[i] === q.correct).length;
+
+    const tileMeta = [
+      { id: 'quiz', code: 'ШАГ 1', title: 'Границы доверия', desc: '6 карточек об ИИ в задачах 1С и 3 вопроса', tab: 'l1' },
+      { id: 'bugs', code: 'ЗАДАНИЕ 2.1', title: 'Разрывы в схеме процесса', desc: '5 ошибок в процессе согласования закупки', tab: 'l2' },
+      { id: 'roi', code: 'ЗАДАНИЕ 2.2', title: 'Расчёт окупаемости', desc: 'Проверь обещание ИИ своими цифрами', tab: 'l2' },
+      { id: 'code', code: 'ЗАДАНИЕ 2.3', title: 'Запрос на языке 1С', desc: '4 правки в запросе от ИИ', tab: 'l2' },
+      { id: 'prompt', code: 'ШАГ 3', title: 'Постановка задачи для ИИ', desc: 'Собери проверяемые требования', tab: 'l3' },
+      { id: 'checklist', code: 'ШАГ 3', title: 'Чек-лист приёмки', desc: '10 пунктов приёмки доработки в 1С', tab: 'l3' }
+    ];
+
+    return {
+      theme: st.theme,
+      themeLabel: st.theme === 'dark' ? 'Тёмная' : 'Светлая',
+      themeDotShadow: st.theme === 'dark' ? '-4px 0 0 0 var(--panel)' : '0 0 0 0 transparent',
+      toggleTheme: () => { const theme = st.theme === 'dark' ? 'light' : 'dark'; this.setState({ theme }); this.persist({ theme }); },
+      typed: st.typed, toast: st.toast,
+      isMap: st.tab === 'map', isL1: st.tab === 'l1', isL2: st.tab === 'l2', isL3: st.tab === 'l3',
+      go: {
+        map: () => this.setState({ tab: 'map' }),
+        l1: () => this.setState({ tab: 'l1' }),
+        l2: () => this.setState({ tab: 'l2' }),
+        l3: () => this.setState({ tab: 'l3' })
+      },
+      doneCount, pct: Math.round((doneCount / 6) * 100) + '%',
+
+      tiles: tileMeta.map((t) => ({
+        code: t.code, title: t.title, desc: t.desc,
+        stamp: st.done[t.id] ? 'выполнено ✓' : 'не пройдено',
+        stampColor: st.done[t.id] ? 'var(--ok)' : 'var(--dim)',
+        go: () => this.setState({ tab: t.tab })
+      })),
+
+      cards: this.CARDS.map((c, i) => ({
+        tag: c.tag, title: c.title, body: c.body, trap: c.trap, accent: c.accent || 'var(--cyan)',
+        open: st.openCard === i, closed: st.openCard !== i,
+        toggle: () => this.setState({ openCard: st.openCard === i ? null : i })
+      })),
+
+      questions: this.QUESTIONS.map((q, qi) => {
+        const picked = st.picks[qi];
+        return {
+          num: qi + 1, text: q.text, explain: q.explain, answered: picked !== undefined,
+          options: q.options.map((text, oi) => {
+            const isPicked = picked === oi, isRight = oi === q.correct;
+            let bg = 'var(--panel-2)', border = 'var(--line-2)', mark = '', markColor = 'var(--dim)';
+            if (picked !== undefined && isRight) { border = 'var(--ok)'; mark = '✓'; markColor = 'var(--ok)'; }
+            if (isPicked && !isRight) { border = 'var(--bad)'; mark = '✕'; markColor = 'var(--bad)'; }
+            if (isPicked) bg = 'var(--panel-3)';
+            return { text, bg, border, mark, markColor, pick: () => this.setState({ picks: Object.assign({}, st.picks, { [qi]: oi }) }) };
+          })
+        };
+      }),
+      quizScore,
+
+      ring, anim, hit, foundCount,
+      msg: st.msg, msgBorder: st.msgOk ? 'var(--ok)' : 'var(--accent)',
+      bugList: this.BUGS.map((b) => ({
+        title: st.found[b.id] ? b.title : 'Ошибка не найдена',
+        why: b.why, found: !!st.found[b.id],
+        mark: st.found[b.id] ? '✓' : '·',
+        markColor: st.found[b.id] ? 'var(--ok)' : 'var(--dim)',
+        titleColor: st.found[b.id] ? 'var(--ink)' : 'var(--dim)',
+        border: st.found[b.id] ? 'var(--ok-line)' : 'var(--line)'
+      })),
+      resetBugs: () => this.setState({ found: {}, msg: '' }),
+      hintOn: st.hintOn,
+      hintLabel: st.hintOn ? 'Скрыть подсказку' : 'Показать подсказку',
+      toggleHint: () => this.setState({ hintOn: !st.hintOn }),
+
+      roiFields: roiMeta.map((f) => ({
+        label: f.label, value: st.roi[f.id],
+        set: (e) => {
+          const v = e.target.value === '' ? '' : Number(e.target.value);
+          this.setState({ roi: Object.assign({}, st.roi, { [f.id]: v }) });
+        }
+      })),
+      savedHours: this.fmt(this.savedHours()),
+      savedMoney: this.fmt(this.savedMoney()),
+      paybackText: pb === null ? '—' : pb.toFixed(1) + ' мес',
+      paybackPct: pb === null ? '100%' : Math.min(100, (pb / 24) * 100).toFixed(1) + '%',
+      paybackColor, paybackVerdict,
+      resetRoi: () => this.setState({ roi: Object.assign({}, this.DEFAULT_ROI) }),
+
+      code: st.code,
+      setCode: (e) => this.setState({ code: e.target.value }),
+      checkCode: () => this.runCode(),
+      resetCode: () => this.setState({ code: this.BROKEN, codeResults: [] }),
+      codeResults: st.codeResults.map((x) => ({ label: x.label, mark: x.ok ? '✓' : '✕', color: x.ok ? 'var(--ok)' : 'var(--bad)' })),
+
+      before: [
+        { n: '1', text: 'Менеджер получает счёт на почту и пересылает бухгалтеру' },
+        { n: '2', text: 'Бухгалтер вручную заносит контрагента и 14 строк номенклатуры' },
+        { n: '3', text: 'Сверяет цены с заявкой в другом окне' },
+        { n: '4', text: 'Печатает счёт и несёт на подпись руководителю' },
+        { n: '5', text: 'Ставит отметку об оплате вручную в таблице Excel' },
+        { n: '6', text: 'Ошибки в номенклатуре находятся в конце месяца' }
+      ],
+      after: [
+        { n: '1', text: 'Счёт приходит из ЭДО и создаёт документ автоматически' },
+        { n: '2', text: 'Номенклатура подставляется из заявки вводом «на основании»' },
+        { n: '3', text: 'Расхождение цены с заявкой проверяет сама система' },
+        { n: '4', text: 'Согласование идёт задачей руководителю в 1С, со сроком' },
+        { n: '5', text: 'Статус оплаты виден в отчёте, Excel не нужен' },
+        { n: '6', text: 'Лимит бюджета контролируется до отправки заказа' }
+      ],
+      diffs: [
+        { title: 'Ручной ввод убран', text: 'Счёт приходит из ЭДО, номенклатура подставляется вводом на основании заявки.' },
+        { title: 'Контроль вместо доверия', text: 'Расхождение цены и лимит бюджета проверяет система, а не бухгалтер глазами.' },
+        { title: 'Согласование стало задачей', text: 'Бумажная подпись заменена задачей в 1С с ответственным по роли и сроком.' },
+        { title: 'Время на документ', text: '12 минут → 3 минуты, участников 3 → 2. Эти цифры и подставляют в расчёт 2.2.' }
+      ],
+
+      chips: this.CHIPS.map((c) => ({
+        label: c.label,
+        bg: st.chosen[c.id] ? 'var(--accent-soft)' : 'var(--panel-2)',
+        border: st.chosen[c.id] ? 'var(--accent)' : 'var(--line-2)',
+        color: st.chosen[c.id] ? 'var(--accent-text)' : 'var(--ink-2)',
+        toggle: () => { const chosen = Object.assign({}, st.chosen, { [c.id]: !st.chosen[c.id] }); this.setState({ chosen }); this.persist({ chosen }); }
+      })),
+      chosenCount: chosenIds.length,
+      promptText, verdict, verdictColor,
+
+      checklist: this.CHECKLIST.map((text, i) => ({
+        text, mark: st.checked[i] ? '✓' : '□',
+        markColor: st.checked[i] ? 'var(--ok)' : 'var(--dim)',
+        color: st.checked[i] ? 'var(--ink)' : 'var(--ink-3)',
+        toggle: () => { const ch = Object.assign({}, st.checked, { [i]: !st.checked[i] }); this.setState({ checked: ch }); this.persist({ checked: ch }); }
+      })),
+      checklistCount,
+
+      reflection: st.reflection, reflectionLen: st.reflection.length,
+      setReflection: (e) => { const v = e.target.value; this.setState({ reflection: v }); this.persist({ reflection: v }); },
+
+      fsBg1: st.fs === 1 ? 'var(--accent-soft)' : 'transparent',
+      fsBg2: st.fs === 2 ? 'var(--accent-soft)' : 'transparent',
+      fsBg3: st.fs === 3 ? 'var(--accent-soft)' : 'transparent',
+      zoom: st.fs === 3 ? 1.3 : (st.fs === 2 ? 1.15 : 1),
+      fontS: () => { this.setState({ fs: 1 }); this.persist({ fs: 1 }); },
+      fontM: () => { this.setState({ fs: 2 }); this.persist({ fs: 2 }); },
+      fontL: () => { this.setState({ fs: 3 }); this.persist({ fs: 3 }); }
+    };
+  }
+}
+</script>
+</body>
+</html>

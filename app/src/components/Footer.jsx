@@ -3,13 +3,15 @@ const NORMS = [
   'Указ Президента РФ от 10.10.2019 № 490',
   'Распоряжение Правительства РФ от 28.07.2017 № 1632-р',
   'Приказ Минпросвещения России от 24.08.2022 № 762',
-  'ФГОС СПО 09.02.11',
+  'ФГОС СПО 09.02.11 «Разработка и управление программным обеспечением»',
+  'Рабочая программа дисциплины ОП.13 «Автоматизация бизнес-процессов»',
 ];
 
-function FontSizeButton({ label, size, bg, onClick }) {
+function FontSizeButton({ label, size, bg, onClick, ariaLabel }) {
   return (
     <button
       onClick={onClick}
+      aria-label={ariaLabel}
       style={{
         background: bg,
         border: '1px solid var(--line-2)',
@@ -41,10 +43,11 @@ export default function Footer({ lab }) {
         }}
       >
         <div>
-          <div style={{ fontWeight: 800, fontSize: 15, marginBottom: 8 }}>UI/UX Lab: ИИ под проверкой</div>
+          <div style={{ fontWeight: 800, fontSize: 15, marginBottom: 8 }}>1С Lab: ИИ под проверкой</div>
           <div style={{ fontSize: 13, lineHeight: 1.6, color: 'var(--dim)', textWrap: 'pretty' }}>
-            Электронный образовательный ресурс. Специальность 09.02.11, МДК «Проектирование и разработка интерфейсов
-            пользователей» и «Разработка кода информационных систем». Сквозной модуль по применению технологий ИИ.
+            Электронный образовательный ресурс. Специальность <strong style={{ color: 'var(--ink-2)' }}>09.02.11
+            «Разработка и управление программным обеспечением»</strong>. Дисциплина <strong style={{ color: 'var(--ink-2)' }}>
+            ДПБ 1, ОП.13 «Автоматизация бизнес-процессов»</strong>. Сквозной модуль по применению технологий ИИ.
           </div>
           <div style={{ marginTop: 10, fontSize: 12, lineHeight: 1.6, color: 'var(--dim)', textWrap: 'pretty' }}>
             Реальных обращений к ИИ-сервисам ресурс не выполняет: весь «ИИ»-контент подготовлен заранее.
@@ -84,9 +87,9 @@ export default function Footer({ lab }) {
           </div>
           <div style={{ fontSize: 13, lineHeight: 1.6, color: 'var(--dim)', marginBottom: 12 }}>Масштаб интерфейса:</div>
           <div style={{ display: 'flex', gap: 8 }}>
-            <FontSizeButton label="A" size={13} bg={lab.fsBg1} onClick={lab.fontS} />
-            <FontSizeButton label="A" size={15} bg={lab.fsBg2} onClick={lab.fontM} />
-            <FontSizeButton label="A" size={18} bg={lab.fsBg3} onClick={lab.fontL} />
+            <FontSizeButton label="A" size={13} bg={lab.fsBg1} onClick={lab.fontS} ariaLabel="Обычный масштаб" />
+            <FontSizeButton label="A" size={15} bg={lab.fsBg2} onClick={lab.fontM} ariaLabel="Увеличенный масштаб" />
+            <FontSizeButton label="A" size={18} bg={lab.fsBg3} onClick={lab.fontL} ariaLabel="Крупный масштаб" />
           </div>
         </div>
       </div>

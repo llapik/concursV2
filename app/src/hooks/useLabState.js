@@ -1,19 +1,23 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
+  AFTER_STEPS,
+  BEFORE_STEPS,
   BROKEN_CODE,
   BUGS,
   CARDS,
+  CHECKLIST,
   CHIPS,
   CLEAN,
+  DEFAULT_ROI,
   DIFFS,
-  NIELSEN,
   PROMPTS,
   QUESTIONS,
+  ROI_FIELDS,
   STORAGE_KEY,
   TILE_META,
   TITLES,
 } from '../data/content';
-import { contrastRatio } from '../lib/contrast';
+import { fmt, payback, savedHours, savedMoney } from '../lib/roi';
 import { runCodeChecks } from '../lib/codeCheck';
 
 const INITIAL_STATE = {
@@ -24,21 +28,20 @@ const INITIAL_STATE = {
   found: {},
   msg: '',
   msgOk: true,
-  fg: '#7a8090',
-  bg: '#1e2029',
+  roi: { ...DEFAULT_ROI },
   code: BROKEN_CODE,
   codeResults: [],
-  slider: 50,
   chosen: {},
-  nielsen: {},
+  checked: {},
   reflection: '',
   fs: 1,
   theme: 'dark',
   typed: '',
   toast: '',
+  hintOn: false,
 };
 
-const BUG_IDS = ['noLabel', 'tabOrder', 'lowContrast', 'tinyTarget', 'hierarchy'];
+const BUG_IDS = ['noRole', 'noDeadline', 'noReject', 'noBudget', 'manualReentry'];
 
 export function useLabState() {
   const [state, setStateRaw] = useState(INITIAL_STATE);
@@ -57,7 +60,7 @@ export function useLabState() {
         setState({
           done: s.done || {},
           reflection: s.reflection || '',
-          nielsen: s.nielsen || {},
+          checked: s.checked || {},
           chosen: s.chosen || {},
           fs: s.fs || 1,
           theme: s.theme || 'dark',
@@ -77,7 +80,7 @@ export function useLabState() {
         JSON.stringify({
           done: state.done,
           reflection: state.reflection,
-          nielsen: state.nielsen,
+          checked: state.checked,
           chosen: state.chosen,
           fs: state.fs,
           theme: state.theme,
@@ -86,9 +89,9 @@ export function useLabState() {
     } catch {
       /* ignore unavailable storage */
     }
-  }, [state.done, state.reflection, state.nielsen, state.chosen, state.fs, state.theme]);
+  }, [state.done, state.reflection, state.checked, state.chosen, state.fs, state.theme]);
 
-  // Hero prompt type/erase loop.
+  // Hero "typed query" loop.
   useEffect(() => {
     const typer = { ti: 0, ci: 0, erasing: false, hold: 0 };
     const timer = setInterval(() => {
@@ -122,23 +125,23 @@ export function useLabState() {
         if (prev.done[id]) return {};
         clearTimeout(toastTimer.current);
         toastTimer.current = setTimeout(() => setState({ toast: '' }), 3600);
-        return { done: { ...prev.done, [id]: true }, toast: TITLES[id] || 'Кейс зачтён' };
+        return { done: { ...prev.done, [id]: true }, toast: TITLES[id] || 'Задание зачтено' };
       });
     },
     [setState],
   );
 
-  const ratio = useMemo(() => contrastRatio(state.fg, state.bg), [state.fg, state.bg]);
+  const pb = useMemo(() => payback(state.roi), [state.roi]);
 
   // Auto-grading: mirrors the source's audit() check run after every relevant change.
   useEffect(() => {
-    if (ratio !== null && ratio >= 4.5) mark('contrast');
-  }, [ratio, mark]);
+    if (pb !== null && pb <= 12) mark('roi');
+  }, [pb, mark]);
 
   useEffect(() => {
-    const okCount = Object.keys(state.nielsen).filter((k) => state.nielsen[k]).length;
-    if (okCount >= 8) mark('nielsen');
-  }, [state.nielsen, mark]);
+    const okCount = Object.keys(state.checked).filter((k) => state.checked[k]).length;
+    if (okCount >= 8) mark('checklist');
+  }, [state.checked, mark]);
 
   useEffect(() => {
     const correctCount = QUESTIONS.filter((q, i) => state.picks[i] === q.correct).length;
@@ -175,47 +178,50 @@ export function useLabState() {
     });
   }, [setState, mark]);
 
-  const setSlider = useCallback(
-    (v) => {
-      setState({ slider: v });
-      if (v > 90 || v < 10) mark('beforeafter');
-    },
-    [setState, mark],
-  );
-
   const doneCount = Object.keys(state.done).length;
   const foundCount = Object.keys(state.found).length;
   const quizScore = QUESTIONS.filter((q, i) => state.picks[i] === q.correct).length;
-  const nielsenCount = Object.keys(state.nielsen).filter((k) => state.nielsen[k]).length;
+  const checklistCount = Object.keys(state.checked).filter((k) => state.checked[k]).length;
 
   const ring = {};
   const anim = {};
   BUG_IDS.forEach((id) => {
-    ring[id] = state.found[id] ? '2px solid #7fd98a' : '1px dashed #383c48';
+    ring[id] = state.found[id] ? '2px solid var(--ok)' : '1px dashed var(--accent)';
     anim[id] = state.found[id] ? 'none' : 'lab-breathe 3.2s ease-in-out infinite';
   });
-  ring.clean1 = '1px dashed var(--line-2)';
-  ring.clean2 = '1px dashed var(--line-2)';
+
+  let paybackVerdict;
+  let paybackColor;
+  if (pb === null) {
+    paybackVerdict = 'Экономии нет: после автоматизации времени уходит столько же или больше. Уменьши минуты «после».';
+    paybackColor = 'var(--bad)';
+  } else if (pb <= 12) {
+    paybackVerdict = 'Окупаемость ' + pb.toFixed(1) + ' мес — проект защитить можно. Задание зачтено.';
+    paybackColor = 'var(--ok)';
+  } else {
+    paybackVerdict = 'Окупаемость ' + pb.toFixed(1) + ' мес — дольше года. Либо экономия мала, либо внедрение слишком дорогое.';
+    paybackColor = 'var(--bad)';
+  }
 
   const chosenChips = CHIPS.filter((c) => state.chosen[c.id]);
   const promptText = chosenChips.length
-    ? 'Спроектируй форму записи к врачу.\n\n' + chosenChips.map((c) => '— ' + c.line).join('\n')
-    : 'Выбери блоки требований слева — промпт соберётся здесь.';
+    ? 'Задача: автоматизировать согласование заявок на закупку в 1С.\n\n' + chosenChips.map((c) => '— ' + c.line).join('\n')
+    : 'Нажимай на требования слева — постановка задачи соберётся здесь.';
   const keyHits = CHIPS.filter((c) => c.key && state.chosen[c.id]).length;
   const hasFluff = !!state.chosen.trendy;
   let verdict;
   let verdictColor;
   if (keyHits === 0) {
-    verdict = 'Пока это не ТЗ. Без портрета пользователя и измеримых требований ИИ выдаст «просто красиво».';
+    verdict = 'Пока это не постановка задачи. Без цели, объектов конфигурации и критериев приёмки ИИ придумает всё сам.';
     verdictColor = 'var(--dim)';
   } else if (keyHits < 6) {
-    verdict = 'Покрыто ' + keyHits + ' из 6 обязательных требований. Не хватает измеримых критериев — ИИ заполнит пробелы по своему усмотрению.';
-    verdictColor = 'var(--accent)';
+    verdict = 'Покрыто ' + keyHits + ' из 6 обязательных требований. Чего-то не хватает — ИИ заполнит пробелы по своему усмотрению.';
+    verdictColor = 'var(--accent-text)';
   } else if (hasFluff) {
-    verdict = 'Требования собраны полностью. «Современно и стильно» ничего не задаёт — такие формулировки лучше убрать: они не проверяемы.';
-    verdictColor = 'var(--accent)';
+    verdict = 'Требования собраны полностью, но «сделать по-современному» ничего не задаёт и проверить это нельзя — такую формулировку лучше убрать.';
+    verdictColor = 'var(--accent-text)';
   } else {
-    verdict = 'Это уже техзадание: каждое требование можно проверить после генерации. Кейс зачтён.';
+    verdict = 'Это уже техзадание: каждое требование можно проверить при приёмке. Задание зачтено.';
     verdictColor = 'var(--ok)';
   }
 
@@ -227,7 +233,6 @@ export function useLabState() {
 
     typed: state.typed,
     toast: state.toast,
-    anim,
 
     isMap: state.tab === 'map',
     isL1: state.tab === 'l1',
@@ -247,7 +252,7 @@ export function useLabState() {
       code: t.code,
       title: t.title,
       desc: t.desc,
-      stamp: state.done[t.id] ? 'в портфолио ✓' : 'не пройден',
+      stamp: state.done[t.id] ? 'выполнено ✓' : 'не пройдено',
       stampColor: state.done[t.id] ? 'var(--ok)' : 'var(--dim)',
       go: () => setState({ tab: t.tab }),
     })),
@@ -257,7 +262,7 @@ export function useLabState() {
       title: c.title,
       body: c.body,
       trap: c.trap,
-      accent: c.accent,
+      accent: c.accent || 'var(--cyan)',
       open: state.openCard === i,
       closed: state.openCard !== i,
       toggle: () => setState((prev) => ({ openCard: prev.openCard === i ? null : i })),
@@ -266,6 +271,7 @@ export function useLabState() {
     questions: QUESTIONS.map((q, qi) => {
       const picked = state.picks[qi];
       return {
+        num: qi + 1,
         text: q.text,
         explain: q.explain,
         answered: picked !== undefined,
@@ -301,12 +307,13 @@ export function useLabState() {
     quizScore,
 
     ring,
+    anim,
     hit: Object.fromEntries([...BUG_IDS, 'clean1', 'clean2'].map((id) => [id, () => hitZone(id)])),
     foundCount,
     msg: state.msg,
     msgBorder: state.msgOk ? 'var(--ok)' : 'var(--accent)',
     bugList: BUGS.map((b) => ({
-      title: state.found[b.id] ? b.title : 'Проблема не найдена',
+      title: state.found[b.id] ? b.title : 'Ошибка не найдена',
       why: b.why,
       found: !!state.found[b.id],
       mark: state.found[b.id] ? '✓' : '·',
@@ -315,20 +322,22 @@ export function useLabState() {
       border: state.found[b.id] ? 'var(--ok-line)' : 'var(--line)',
     })),
     resetBugs: () => setState({ found: {}, msg: '' }),
+    hintOn: state.hintOn,
+    hintLabel: state.hintOn ? 'Скрыть подсказку' : 'Показать подсказку',
+    toggleHint: () => setState((prev) => ({ hintOn: !prev.hintOn })),
 
-    fg: state.fg,
-    bg: state.bg,
-    setFg: (v) => setState({ fg: v }),
-    setBg: (v) => setState({ bg: v }),
-    ratioText: ratio === null ? '—' : ratio.toFixed(2) + ':1',
-    ratioPct: ratio === null ? '0%' : Math.min(100, (ratio / 21) * 100).toFixed(1) + '%',
-    ratioColor: ratio === null ? 'var(--dim)' : ratio >= 4.5 ? 'var(--ok)' : 'var(--bad)',
-    aaLabel: ratio !== null && ratio >= 4.5 ? 'AA основной текст — пройден' : 'AA основной текст — не пройден',
-    aaColor: ratio !== null && ratio >= 4.5 ? 'var(--ok)' : 'var(--bad)',
-    aaaLabel: ratio !== null && ratio >= 7 ? 'AAA — пройден' : 'AAA (7:1) — не пройден',
-    aaaColor: ratio !== null && ratio >= 7 ? 'var(--ok)' : 'var(--dim)',
-    largeLabel: ratio !== null && ratio >= 3 ? 'AA крупный текст (3:1) — пройден' : 'AA крупный текст (3:1) — не пройден',
-    largeColor: ratio !== null && ratio >= 3 ? 'var(--ok)' : 'var(--bad)',
+    roiFields: ROI_FIELDS.map((f) => ({
+      label: f.label,
+      value: state.roi[f.id],
+      set: (v) => setState((prev) => ({ roi: { ...prev.roi, [f.id]: v === '' ? '' : Number(v) } })),
+    })),
+    savedHours: fmt(savedHours(state.roi)),
+    savedMoney: fmt(savedMoney(state.roi)),
+    paybackText: pb === null ? '—' : pb.toFixed(1) + ' мес',
+    paybackPct: pb === null ? '100%' : Math.min(100, (pb / 24) * 100).toFixed(1) + '%',
+    paybackColor,
+    paybackVerdict,
+    resetRoi: () => setState({ roi: { ...DEFAULT_ROI } }),
 
     code: state.code,
     setCode: (v) => setState({ code: v }),
@@ -336,17 +345,15 @@ export function useLabState() {
     resetCode: () => setState({ code: BROKEN_CODE, codeResults: [] }),
     codeResults: state.codeResults.map((x) => ({ label: x.label, mark: x.ok ? '✓' : '✕', color: x.ok ? 'var(--ok)' : 'var(--bad)' })),
 
-    slider: state.slider,
-    setSlider,
-    clip: 'inset(0 0 0 ' + state.slider + '%)',
-    handleLeft: state.slider + '%',
+    before: BEFORE_STEPS,
+    after: AFTER_STEPS,
     diffs: DIFFS,
 
     chips: CHIPS.map((c) => ({
       label: c.label,
       bg: state.chosen[c.id] ? 'var(--accent-soft)' : 'var(--panel-2)',
       border: state.chosen[c.id] ? 'var(--accent)' : 'var(--line-2)',
-      color: state.chosen[c.id] ? 'var(--accent)' : 'var(--ink-2)',
+      color: state.chosen[c.id] ? 'var(--accent-text)' : 'var(--ink-2)',
       toggle: () => setState((prev) => ({ chosen: { ...prev.chosen, [c.id]: !prev.chosen[c.id] } })),
     })),
     chosenCount: chosenChips.length,
@@ -354,14 +361,14 @@ export function useLabState() {
     verdict,
     verdictColor,
 
-    nielsen: NIELSEN.map((text, i) => ({
+    checklist: CHECKLIST.map((text, i) => ({
       text,
-      mark: state.nielsen[i] ? '✓' : '□',
-      markColor: state.nielsen[i] ? 'var(--ok)' : 'var(--dim)',
-      color: state.nielsen[i] ? 'var(--ink)' : 'var(--dim)',
-      toggle: () => setState((prev) => ({ nielsen: { ...prev.nielsen, [i]: !prev.nielsen[i] } })),
+      mark: state.checked[i] ? '✓' : '□',
+      markColor: state.checked[i] ? 'var(--ok)' : 'var(--dim)',
+      color: state.checked[i] ? 'var(--ink)' : 'var(--ink-3)',
+      toggle: () => setState((prev) => ({ checked: { ...prev.checked, [i]: !prev.checked[i] } })),
     })),
-    nielsenCount,
+    checklistCount,
 
     reflection: state.reflection,
     reflectionLen: state.reflection.length,

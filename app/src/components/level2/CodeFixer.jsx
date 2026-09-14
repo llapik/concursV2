@@ -2,19 +2,43 @@ export default function CodeFixer({ lab }) {
   return (
     <div style={{ border: '1px solid var(--line)', background: 'var(--panel)', borderRadius: 14, padding: 22 }}>
       <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11, color: 'var(--dim)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
-        Кейс 2.3
+        Задание 2.3
       </div>
-      <h3 style={{ fontSize: 21, fontWeight: 800, margin: '6px 0 8px', letterSpacing: '-0.02em' }}>Почини код</h3>
-      <p style={{ fontSize: 14, lineHeight: 1.55, color: 'var(--ink-3)', margin: '0 0 14px', textWrap: 'pretty' }}>
-        Сниппет «от ИИ» с четырьмя дефектами. Правь прямо здесь и нажми «Проверить» — разбирается именно твой код.
-      </p>
+      <h3 style={{ fontSize: 21, fontWeight: 800, margin: '6px 0 8px', letterSpacing: '-0.02em' }}>Почини запрос, который написал ИИ</h3>
+      <div
+        style={{
+          border: '1px solid var(--line)',
+          background: 'var(--panel-2)',
+          borderLeft: '4px solid var(--accent)',
+          borderRadius: 8,
+          padding: '14px 16px',
+          marginBottom: 14,
+        }}
+      >
+        <div style={{ fontSize: 14, fontWeight: 800, color: 'var(--accent-text)', marginBottom: 6 }}>Что делать — 4 правки</div>
+        <div style={{ fontSize: 14, lineHeight: 1.6, color: 'var(--ink-2)' }}>
+          1. Убрать <span style={{ fontFamily: "'IBM Plex Mono', monospace" }}>*</span> и перечислить нужные поля через
+          запятую
+          <br />
+          2. Заменить соединение через запятую на{' '}
+          <span style={{ fontFamily: "'IBM Plex Mono', monospace" }}>ЛЕВОЕ СОЕДИНЕНИЕ … ПО …</span>
+          <br />
+          3. Добавить отбор:{' '}
+          <span style={{ fontFamily: "'IBM Plex Mono', monospace" }}>ГДЕ Заявка.Дата МЕЖДУ &НачалоПериода И &КонецПериода</span>
+          <br />
+          4. Передать дату в саму виртуальную таблицу:{' '}
+          <span style={{ fontFamily: "'IBM Plex Mono', monospace" }}>.Остатки(&КонецПериода, )</span>
+          <br />
+          Затем нажми жёлтую кнопку «Проверить».
+        </div>
+      </div>
       <textarea
         value={lab.code}
         onChange={(e) => lab.setCode(e.target.value)}
         spellCheck={false}
         style={{
           width: '100%',
-          minHeight: 210,
+          minHeight: 230,
           background: 'var(--field)',
           border: '1px solid var(--line-2)',
           borderRadius: 8,
@@ -37,13 +61,13 @@ export default function CodeFixer({ lab }) {
             borderRadius: 8,
             padding: '12px 18px',
             fontFamily: 'Manrope, sans-serif',
-            fontSize: 14,
+            fontSize: 15,
             fontWeight: 800,
             cursor: 'pointer',
-            minHeight: 44,
+            minHeight: 48,
           }}
         >
-          Проверить
+          ✓ Проверить мой запрос
         </button>
         <button
           onClick={lab.resetCode}
@@ -51,21 +75,21 @@ export default function CodeFixer({ lab }) {
           style={{
             background: 'transparent',
             border: '1px solid var(--line-2)',
-            color: 'var(--dim)',
+            color: 'var(--ink-2)',
             borderRadius: 8,
             padding: '12px 18px',
-            fontFamily: "'IBM Plex Mono', monospace",
-            fontSize: 12,
+            fontFamily: 'Manrope, sans-serif',
+            fontSize: 14,
             cursor: 'pointer',
-            minHeight: 44,
+            minHeight: 48,
           }}
         >
-          Вернуть исходник
+          Вернуть как было
         </button>
       </div>
       <div style={{ marginTop: 14, display: 'grid', gap: 8 }}>
         {lab.codeResults.map((r, i) => (
-          <div key={i} style={{ display: 'flex', gap: 10, alignItems: 'baseline', fontSize: 13, lineHeight: 1.5 }}>
+          <div key={i} style={{ display: 'flex', gap: 10, alignItems: 'baseline', fontSize: 13.5, lineHeight: 1.5 }}>
             <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 12, color: r.color }}>{r.mark}</span>
             <span style={{ color: 'var(--ink-2)', textWrap: 'pretty' }}>{r.label}</span>
           </div>
