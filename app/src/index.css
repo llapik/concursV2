@@ -145,6 +145,42 @@ button {
   }
 }
 
+@keyframes lab-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-14px) rotate(var(--lab-float-rotate, 6deg));
+  }
+}
+
+.lab-floaters {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@media (max-width: 820px) {
+  .lab-floaters {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lab-floaters {
+    display: none;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
 .lab-nav-btn:hover {
   background: var(--panel-2);
   color: var(--ink);
