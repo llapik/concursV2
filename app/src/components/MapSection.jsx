@@ -39,7 +39,7 @@ export default function MapSection({ lab }) {
               marginBottom: 18,
             }}
           >
-            Тренажёр · ОП.13 Автоматизация бизнес-процессов
+            Симулятор · ОП.13 Автоматизация бизнес-процессов
           </div>
           <h1 style={{ fontSize: 'clamp(30px, 5vw, 56px)', lineHeight: 1.05, letterSpacing: '-0.035em', fontWeight: 800, margin: '0 0 20px', textWrap: 'pretty' }}>
             ИИ предложил решение в 1С.
@@ -127,7 +127,7 @@ export default function MapSection({ lab }) {
           <div style={{ border: '1px solid var(--accent)', background: 'var(--panel)', borderRadius: 12, padding: 22 }}>
             <div style={{ fontSize: 20, fontWeight: 800, marginBottom: 10 }}>Привет, студент</div>
             <div style={{ fontSize: 15, lineHeight: 1.6, color: 'var(--ink-2)', textWrap: 'pretty' }}>
-              Это тренажёр по дисциплине <strong style={{ color: 'var(--ink)' }}>ОП.13 «Автоматизация бизнес-процессов»</strong>.
+              Это симулятор по дисциплине <strong style={{ color: 'var(--ink)' }}>ОП.13 «Автоматизация бизнес-процессов»</strong>.
               Здесь ты не учишься пользоваться ИИ — <strong style={{ color: 'var(--ink)' }}>здесь ты учишься проверять то, что
               ИИ выдал</strong>: схему процесса, расчёт окупаемости, запрос и код в 1С.
             </div>
@@ -135,7 +135,7 @@ export default function MapSection({ lab }) {
               <div>
                 <div style={{ fontSize: 13, fontWeight: 800, color: 'var(--accent-text)', marginBottom: 3 }}>Зачем это нужно</div>
                 <div style={{ fontSize: 14, lineHeight: 1.5, color: 'var(--ink-2)' }}>
-                  На работе за ошибку ИИ отвечает не ИИ, а специалист, который её пропустил. Тренажёр учит замечать
+                  На работе за ошибку ИИ отвечает не ИИ, а специалист, который её пропустил. Симулятор учит замечать
                   такие ошибки до того, как они попадут в базу заказчика.
                 </div>
               </div>
@@ -196,7 +196,7 @@ export default function MapSection({ lab }) {
                 }}
               />
             </div>
-            <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 14 }}>Проверку делает не ИИ, а сам тренажёр</div>
+            <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 14 }}>Проверку делает не ИИ, а сам симулятор</div>
             <div style={{ display: 'grid', gap: 10 }}>
               {[
                 'Окупаемость считается по твоим цифрам прямо в браузере',
