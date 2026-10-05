@@ -238,11 +238,16 @@ export function useLabState() {
     isL1: state.tab === 'l1',
     isL2: state.tab === 'l2',
     isL3: state.tab === 'l3',
+    isDemo: state.tab === 'demo',
+    isAbout: state.tab === 'about',
+    setTab: (t) => { setState({ tab: t }); window.scrollTo(0, 0); },
     go: {
       map: () => setState({ tab: 'map' }),
       l1: () => setState({ tab: 'l1' }),
       l2: () => setState({ tab: 'l2' }),
       l3: () => setState({ tab: 'l3' }),
+      demo: () => setState({ tab: 'demo' }),
+      about: () => setState({ tab: 'about' }),
     },
 
     doneCount,

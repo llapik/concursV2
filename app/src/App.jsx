@@ -4,6 +4,8 @@ import MapSection from './components/MapSection';
 import Level1 from './components/Level1';
 import Level2 from './components/Level2';
 import Level3 from './components/Level3';
+import AiStand from './components/AiStand';
+import Passport from './components/Passport';
 import Toast from './components/Toast';
 import Footer from './components/Footer';
 
@@ -33,6 +35,8 @@ export default function App() {
         {lab.isL1 && <Level1 lab={lab} />}
         {lab.isL2 && <Level2 lab={lab} />}
         {lab.isL3 && <Level3 lab={lab} />}
+        {lab.isDemo && <AiStand lab={lab} />}
+        {lab.isAbout && <Passport />}
       </main>
 
       <Toast toast={lab.toast} />

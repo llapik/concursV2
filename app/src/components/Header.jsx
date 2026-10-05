@@ -14,6 +14,7 @@ function NavButton({ label, badge, badgeBg, badgeColor, active, onClick }) {
         fontSize: 14,
         fontWeight: 600,
         padding: '8px 12px',
+        minHeight: 44,
         cursor: 'pointer',
         borderRadius: 6,
         whiteSpace: 'nowrap',
@@ -71,7 +72,7 @@ export default function Header({ lab }) {
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <img
               src={logo}
-              alt="Московский государственный образовательный комплекс"
+              alt="Миасский геологоразведочный колледж (МГРК)"
               style={{
                 height: 34,
                 width: 'auto',
@@ -172,6 +173,8 @@ export default function Header({ lab }) {
             active={lab.isL3}
             onClick={lab.go.l3}
           />
+          <NavButton label="ИИ-стенд · демо" badge="ИИ" badgeBg="var(--cyan)" badgeColor="var(--on-accent)" active={lab.isDemo} onClick={lab.go.demo} />
+          <NavButton label="Паспорт ЭОР" badge="i" badgeBg="var(--line-3)" badgeColor="var(--ink)" active={lab.isAbout} onClick={lab.go.about} />
         </nav>
       </div>
     </header>

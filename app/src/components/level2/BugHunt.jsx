@@ -61,6 +61,9 @@ export default function BugHunt({ lab }) {
               <div
                 key={s.key}
                 onClick={lab.hit[s.key]}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); lab.hit[s.key](); } }}
                 style={{
                   cursor: 'pointer',
                   outline: s.clean ? '1px dashed var(--mock-line)' : lab.ring[s.key],

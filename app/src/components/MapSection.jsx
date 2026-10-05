@@ -133,6 +133,24 @@ export default function MapSection({ lab }) {
               >
                 Сразу к практике
               </button>
+              <button
+                onClick={lab.go.demo}
+                className="lab-outline-btn"
+                style={{
+                  background: 'transparent',
+                  color: 'var(--cyan)',
+                  border: '1px solid var(--cyan)',
+                  borderRadius: 8,
+                  padding: '16px 26px',
+                  fontFamily: 'Manrope, sans-serif',
+                  fontSize: 16,
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  minHeight: 52,
+                }}
+              >
+                ИИ-стенд (демо)
+              </button>
             </div>
           </div>
 
